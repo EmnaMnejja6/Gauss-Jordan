@@ -69,13 +69,13 @@ const MatrixInput: React.FC = () => {
       .map((value) => value.toString())
       .join("\\\\");
 
-    return `\\left(\\begin{matrix}${matrixString}\\end{matrix}\\right)`;
+    return `\\left(\\begin{matrix}${solutionMatrix}\\end{matrix}\\right)`;
   };
 
   return (
-    <div style={{ width: "100%" }}>
-      <h2>Saisie de Matrice</h2>
-      <label>Taille de la Matrice: </label>
+    <div style={{ width: "600vh", fontSize: "24px" }}>
+      <h2>Matrix Input</h2>
+      <label>Matrix Size: </label>
       <input
         type="number"
         value={matrixSize}
@@ -84,8 +84,12 @@ const MatrixInput: React.FC = () => {
         max={5}
       />
 
-      <div>
-        <table>
+      <div style={{ display: "inline-block", margin: "20px 0" }}>
+        <MathJaxContext>
+          <MathJax dynamic>{`\\[ ${renderMatrix()} \\]`}</MathJax>
+        </MathJaxContext>
+
+        <table style={{ borderCollapse: "separate", borderSpacing: "5px" }}>
           <tbody>
             {matrix.map((row, rowIndex) => (
               <tr key={rowIndex}>
@@ -97,6 +101,10 @@ const MatrixInput: React.FC = () => {
                       onChange={(e) =>
                         handleMatrixChange(e, rowIndex, colIndex)
                       }
+                      style={{
+                        width: "50px",
+                        textAlign: "center",
+                      }}
                     />
                   </td>
                 ))}
@@ -105,30 +113,26 @@ const MatrixInput: React.FC = () => {
           </tbody>
         </table>
       </div>
-
-      <MathJaxContext>
-        <MathJax dynamic>{`\\[ ${renderMatrix()} \\]`}</MathJax>
-      </MathJaxContext>
-
+      <br/>
       {/* Matrix type buttons */}
       <div
         className="button-container"
         style={{ display: "flex", gap: "10px", marginBottom: "20px" }}
       >
-        <button className="btn btn-secondary mt-3">Diagonale</button>
+        <button className="btn btn-secondary mt-3">Diagonal</button>
         <button className="btn btn-secondary mt-3">
-          Symétrique définie positive
+          Symmetric Positive Definite
         </button>
-        <button className="btn btn-secondary mt-3">Bande</button>
+        <button className="btn btn-secondary mt-3">Band</button>
       </div>
 
-      {/* Résolution Button */}
+      {/* Resolution Button */}
       <button
         className="btn btn-primary mt-3"
         style={{ backgroundColor: "#007bff", color: "white" }}
         onClick={handleResolution}
       >
-        Résolution
+        Solve
       </button>
       {/* Clear Matrix Button */}
       <button className="btn btn-danger mt-3 ms-2" onClick={handleClearMatrix}>
@@ -138,7 +142,7 @@ const MatrixInput: React.FC = () => {
       {/* Render the solution matrix */}
       {solutionMatrix && (
         <div>
-          <h2>Solution du Système</h2>
+          <h2>System Solution</h2>
           <MathJaxContext>
             <MathJax dynamic>{`\\[ b= ${renderSolutionMatrix()} \\]`}</MathJax>
           </MathJaxContext>
@@ -148,13 +152,13 @@ const MatrixInput: React.FC = () => {
             className="btn btn-secondary mt-3"
             onClick={() => setShowSteps(!showSteps)}
           >
-            {showSteps ? "Cacher les étapes" : "Montrer les étapes"}
+            {showSteps ? "Hide Steps" : "Show Steps"}
           </button>
 
           {/* Conditionally render steps */}
           {showSteps && (
             <div className="steps-container mt-3">
-              <h3>Étapes de la Résolution</h3>
+              <h3>Solution Steps</h3>
               <div className="steps-content">
                 {steps.map((step, index) => (
                   <div key={index}>

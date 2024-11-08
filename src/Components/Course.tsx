@@ -35,10 +35,7 @@ const Cours = () => {
 
   return (
     <MathJaxContext>
-      <div
-        className="container"
-        style={{ maxWidth: "800px", margin: "0 auto", padding: "20px" }}
-      >
+      <div className="container" style={{ width: "600vh" }}>
         <h2>Gauss-Jordan Elimination Method</h2>
         <p>
           The Gauss-Jordan elimination method is a process to solve systems of

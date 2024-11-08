@@ -1,5 +1,6 @@
-
-{/*This is the file that contains all the functions and algorithms*/}
+{
+  /*This is the file that contains all the functions and algorithms*/
+}
 export function gaussJordan(matrix: number[][]): {
   matrix: number[][]; // The final reduced matrix
   L: number[][]; // The lower triangular matrix (L)
@@ -58,4 +59,42 @@ function formatMatrix(matrix: number[][]): string {
   return `\\begin{bmatrix} ${matrix
     .map((row) => row.join(" & "))
     .join(" \\\\ ")} \\end{bmatrix}`;
+}
+
+// Function to calculate the inverse of a matrix using the Gauss-Jordan elimination method
+export function inverseMatrix(matrix: number[][]): number[][] | null {
+  const n = matrix.length;
+  const inv = Array.from({ length: n }, (_, i) =>
+    Array.from({ length: n }, (_, j) => (i === j ? 1 : 0))
+  );
+
+  // Make a deep copy of the matrix to avoid mutating the original
+  const mat = matrix.map((row) => [...row]);
+
+  for (let i = 0; i < n; i++) {
+    let diag = mat[i][i];
+    if (diag === 0) {
+      // If we encounter a zero diagonal element, the matrix is singular and has no inverse
+      return null;
+    }
+
+    // Normalize the row by dividing by the diagonal element
+    for (let j = 0; j < n; j++) {
+      mat[i][j] /= diag;
+      inv[i][j] /= diag;
+    }
+
+    // Make other rows zero in the current column
+    for (let k = 0; k < n; k++) {
+      if (k !== i) {
+        const factor = mat[k][i];
+        for (let j = 0; j < n; j++) {
+          mat[k][j] -= factor * mat[i][j];
+          inv[k][j] -= factor * inv[i][j];
+        }
+      }
+    }
+  }
+
+  return inv; // Return the inverse matrix
 }
