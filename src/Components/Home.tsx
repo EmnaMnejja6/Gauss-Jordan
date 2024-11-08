@@ -36,6 +36,8 @@ const GaussJordan: React.FC = () => {
         <button style={styles.button} onClick={() => navigate("/courses")}>
           Commencer
         </button>
+
+        <h6 style={{textAlign:"center" ,marginLeft:"250px", marginTop:"100px", color:"blue"}}>Made by Mayna & Noussa &hearts; </h6>
       </div>
     </MathJaxContext>
   );
@@ -51,15 +53,15 @@ const styles = {
     marginTop: "200px",
   },
   button: {
-    fontSize: "20px",
+    fontSize: "25px",
     padding: "10px 20px",
     backgroundColor: "#007bff",
     color: "#fff",
     border: "none",
     borderRadius: "5px",
     cursor: "pointer",
-    marginTop: "20px",
-    marginLeft: "60px",
+    marginTop: "80px",
+    marginLeft: "1200px",
   },
 };
 

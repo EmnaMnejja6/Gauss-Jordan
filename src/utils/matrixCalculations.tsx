@@ -1,6 +1,135 @@
 {
-  /*This is the file that contains all the functions and algorithms*/
+  /*This File that contains all the functions and algorithms*/
 }
+export function isSymmetric(mat: number[][]): boolean {
+  const n = mat.length;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      if (mat[i][j] !== mat[j][i]) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+export function isPositiveDefinite(mat: number[][]): boolean {
+  const n = mat.length;
+  const L: number[][] = Array.from({ length: n }, () => Array(n).fill(0));
+
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j <= i; j++) {
+      let sum = 0;
+
+      for (let k = 0; k < j; k++) {
+        sum += L[i][k] * L[j][k];
+      }
+
+      if (i === j) {
+        const val = mat[i][i] - sum;
+        if (val <= 0) {
+          return false;
+        }
+        L[i][j] = Math.sqrt(val);
+      } else {
+        L[i][j] = (mat[i][j] - sum) / L[j][j];
+      }
+    }
+  }
+  return true;
+}
+function augmentMatrix(mat: number[][]): number[][] {
+  const n = mat.length;
+  return mat.map((row, i) => [
+    ...row,
+    ...Array(n)
+      .fill(0)
+      .map((_, j) => (j === i ? 1 : 0)), // Add identity matrix
+  ]);
+}
+
+export function isInvertible(mat: number[][]): boolean {
+  const n = mat.length;
+  for (let i = 0; i < n; i++) {
+    if (mat[i][i] === 0) {
+      let permuted = false;
+      for (let j = i + 1; j < n; j++) {
+        if (mat[j][i] !== 0) {
+          [mat[i], mat[j]] = [mat[j], mat[i]]; // Swap rows
+          permuted = true;
+          break;
+        }
+      }
+      if (!permuted) {
+        console.log("The matrix is singular and cannot be inverted.");
+        return false;
+      }
+    }
+  }
+  return true;
+}
+export function isDiagonallyDominant(matrix: number[][]): boolean {
+  const n = matrix.length;
+
+  for (let i = 0; i < n; i++) {
+    let diagonalElement = Math.abs(matrix[i][i]);
+    let sumOfOffDiagonal = 0;
+
+    // Sum all non-diagonal elements in the row
+    for (let j = 0; j < n; j++) {
+      if (i !== j) {
+        sumOfOffDiagonal += Math.abs(matrix[i][j]);
+      }
+    }
+
+    // Check if the diagonal element is greater than or equal to the sum of off-diagonal elements
+    if (diagonalElement < sumOfOffDiagonal) {
+      return false; // The matrix is not diagonally dominant
+    }
+  }
+
+  return true; // The matrix is diagonally dominant
+}
+
+export function invertMatrix(mat: number[][]): number[][] | null {
+  const n = mat.length;
+  let augmentedMatrix = augmentMatrix(mat);
+
+  // Check if the matrix is invertible
+  if (!isInvertible(augmentedMatrix)) {
+    return null;
+  }
+
+  for (let k = 0; k < n; k++) {
+    let diag = augmentedMatrix[k][k];
+
+    // Normalize the pivot row
+    for (let j = 0; j < 2 * n; j++) {
+      augmentedMatrix[k][j] /= diag;
+    }
+
+    // Eliminate other rows above the pivot
+    for (let i = 0; i < k; i++) {
+      const factor = augmentedMatrix[i][k];
+      for (let j = 0; j < 2 * n; j++) {
+        augmentedMatrix[i][j] -= factor * augmentedMatrix[k][j];
+      }
+    }
+
+    // Eliminate other rows below the pivot
+    for (let i = k + 1; i < n; i++) {
+      const factor = augmentedMatrix[i][k];
+      for (let j = 0; j < 2 * n; j++) {
+        augmentedMatrix[i][j] -= factor * augmentedMatrix[k][j];
+      }
+    }
+  }
+
+  // Extract the inverse matrix from the augmented matrix
+  const inverseMatrix = augmentedMatrix.map((row) => row.slice(n));
+  return inverseMatrix;
+}
+
 export function gaussJordan(matrix: number[][]): {
   matrix: number[][]; // The final reduced matrix
   L: number[][]; // The lower triangular matrix (L)
@@ -54,6 +183,63 @@ export function gaussJordan(matrix: number[][]): {
   return { matrix, L, steps };
 }
 
+function jordanWithPivot(a: number[][]): void {
+  const n = a.length;
+  let c = 0;
+
+  for (let k = 0; k < n; k++) {
+    let max = Math.abs(a[k][k]);
+    let iPivot = k;
+
+    // Find the pivot row
+    for (let i = k + 1; i < n; i++) {
+      if (Math.abs(a[i][k]) > max) {
+        max = Math.abs(a[i][k]);
+        iPivot = i;
+      }
+    }
+
+    // Swap the current row with the pivot row if needed
+    if (iPivot !== k) {
+      for (let j = 0; j < n + 1; j++) {
+        const temp = a[k][j];
+        a[k][j] = a[iPivot][j];
+        a[iPivot][j] = temp;
+      }
+    }
+
+    console.log(`Iteration k = ${k}`);
+
+    // Normalize the pivot row
+    for (let j = k + 1; j < n + 1; j++) {
+      a[k][j] = a[k][j] / a[k][k];
+      c += 1;
+    }
+
+    // Eliminate above the pivot
+    for (let i = 0; i < k; i++) {
+      for (let j = k + 1; j < n + 1; j++) {
+        a[i][j] = a[i][j] - a[i][k] * a[k][j];
+        c += 2;
+      }
+    }
+
+    // Eliminate below the pivot
+    for (let i = k + 1; i < n; i++) {
+      for (let j = k + 1; j < n + 1; j++) {
+        a[i][j] = a[i][j] - a[i][k] * a[k][j];
+        c += 2;
+      }
+    }
+
+    // Output the current state of the matrix
+    for (let i = 0; i < n; i++) {
+      console.log(a[i].join("\t"));
+    }
+    console.log("\n");
+  }
+}
+
 // Format a matrix as a LaTeX bmatrix string
 function formatMatrix(matrix: number[][]): string {
   return `\\begin{bmatrix} ${matrix
@@ -61,7 +247,6 @@ function formatMatrix(matrix: number[][]): string {
     .join(" \\\\ ")} \\end{bmatrix}`;
 }
 
-// Function to calculate the inverse of a matrix using the Gauss-Jordan elimination method
 export function inverseMatrix(matrix: number[][]): number[][] | null {
   const n = matrix.length;
   const inv = Array.from({ length: n }, (_, i) =>

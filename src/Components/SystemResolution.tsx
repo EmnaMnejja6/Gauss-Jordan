@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { MathJax, MathJaxContext } from "better-react-mathjax";
 import { gaussJordan } from "../utils/matrixCalculations";
 
-const MatrixInput: React.FC = () => {
+const SystemResolution: React.FC = () => {
   const [matrixSize, setMatrixSize] = useState<number>(2);
   const [matrix, setMatrix] = useState<number[][]>(
     Array(2).fill(Array(3).fill(0))
@@ -73,7 +73,15 @@ const MatrixInput: React.FC = () => {
   };
 
   return (
-    <div style={{ width: "600vh", fontSize: "24px" }}>
+    <div
+      style={{
+        width: "600vh",
+        fontSize: "24px",
+        marginTop: "100px",
+        marginLeft: "600px",
+        textAlign: "justify",
+      }}
+    >
       <h2>Matrix Input</h2>
       <label>Matrix Size: </label>
       <input
@@ -176,4 +184,4 @@ const MatrixInput: React.FC = () => {
   );
 };
 
-export default MatrixInput;
+export default SystemResolution;
