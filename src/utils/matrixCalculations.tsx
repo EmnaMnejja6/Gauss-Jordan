@@ -1,5 +1,5 @@
 
-
+{/*This is the file that contains all the functions and algorithms*/}
 export function gaussJordan(matrix: number[][]): {
   matrix: number[][]; // The final reduced matrix
   L: number[][]; // The lower triangular matrix (L)
