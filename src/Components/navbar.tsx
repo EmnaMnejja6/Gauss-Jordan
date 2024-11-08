@@ -1,55 +1,35 @@
 import React from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 
-interface NavbarProps {
-  onSelect: (section: string) => void;
-  selectedSection: string;
-}
+const Navbar: React.FC = () => {
+  const navigate = useNavigate();
 
-const Navbar: React.FC<NavbarProps> = ({ onSelect, selectedSection }) => {
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light fixed-top w-100">
       <ul className="nav nav-pills mx-auto" style={{ fontSize: "20px" }}>
         <li className="nav-item">
           <a
-            className={`nav-link ${selectedSection === "home" ? "active" : ""}`}
-            href="#"
-            onClick={() => onSelect("home")}
+            className="nav-link"
+            onClick={() => navigate("/")}
+            style={{ cursor: "pointer" }}
           >
             Home
           </a>
         </li>
         <li className="nav-item">
-          <a
-            className={`nav-link ${
-              selectedSection === "cours" ? "active" : ""
-            }`}
-            href="#"
-            onClick={() => onSelect("cours")}
-          >
+          <NavLink to="/courses" className="nav-link">
             Course
-          </a>
+          </NavLink>
         </li>
         <li className="nav-item">
-          <a
-            className={`nav-link ${
-              selectedSection === "resolution" ? "active" : ""
-            }`}
-            href="#"
-            onClick={() => onSelect("resolution")}
-          >
+          <NavLink to="/resolution" className="nav-link">
             Resolution
-          </a>
+          </NavLink>
         </li>
         <li className="nav-item">
-          <a
-            className={`nav-link ${
-              selectedSection === "inverse" ? "active" : ""
-            }`}
-            href="#"
-            onClick={() => onSelect("inverse")}
-          >
+          <NavLink to="/inverse" className="nav-link">
             Inverse
-          </a>
+          </NavLink>
         </li>
       </ul>
     </nav>
