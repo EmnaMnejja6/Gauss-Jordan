@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import Cours from "./Components/Course";
 import InverseCalculation from "./Components/InverseCalculation";
-import MatrixInput from "./Components/MatrixInput";
-import GaussJordan from "./Components/GaussJordan";
+import MatrixInput from "./Components/SystemResolution";
+import GaussJordan from "./Components/Home";
 import Navbar from "./Components/navbar";
 
 const App: React.FC = () => {
@@ -25,9 +25,9 @@ const App: React.FC = () => {
           display: "flex", // Make the main area a flex container
           justifyContent: "center", // Center the content horizontally
           alignItems: "center", // Center the content vertically
-          overflow: "auto",
           marginRight: "0",
-          paddingLeft: "650px", // Ensure content doesn't overflow
+          marginTop: "20px",
+          // paddingLeft: "650px", // Ensure content doesn't overflow
         }}
       >
         {/* Dynamic content rendering based on selection */}

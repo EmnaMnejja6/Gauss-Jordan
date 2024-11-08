@@ -69,7 +69,7 @@ const MatrixInput: React.FC = () => {
       .map((value) => value.toString())
       .join("\\\\");
 
-    return `\\left(\\begin{matrix}${solutionMatrix}\\end{matrix}\\right)`;
+    return `\\left(\\begin{matrix}${matrixString}\\end{matrix}\\right)`;
   };
 
   return (
@@ -81,7 +81,7 @@ const MatrixInput: React.FC = () => {
         value={matrixSize}
         onChange={handleMatrixSizeChange}
         min={2}
-        max={5}
+        max={10}
       />
 
       <div style={{ display: "inline-block", margin: "20px 0" }}>
@@ -113,7 +113,7 @@ const MatrixInput: React.FC = () => {
           </tbody>
         </table>
       </div>
-      <br/>
+      <br />
       {/* Matrix type buttons */}
       <div
         className="button-container"
