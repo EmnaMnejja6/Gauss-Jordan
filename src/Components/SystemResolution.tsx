@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import { MathJax, MathJaxContext } from "better-react-mathjax";
-import { gaussJordan } from "../utils/matrixCalculations";
+import {
+  gaussJordanWithPivot,
+  gaussJordanWithoutPivot,
+  resolveDiagonal,
+  resolveSymmetric,
+  resolveBand,
+} from "../utils/matrixCalculations";
 
 const SystemResolution: React.FC = () => {
   const [matrixSize, setMatrixSize] = useState<number>(2);
@@ -9,14 +15,15 @@ const SystemResolution: React.FC = () => {
   ); // Initial size n x (n + 1)
   const [solutionMatrix, setSolutionMatrix] = useState<number[][] | null>(null);
   const [steps, setSteps] = useState<string[]>([]);
-
-  const [showSteps, setShowSteps] = useState<boolean>(true); // New state to toggle step visibility
+  const [showSteps, setShowSteps] = useState<boolean>(true);
+  const [matrixType, setMatrixType] = useState<string | null>(null); // Track selected matrix type
+  const [error, setError] = useState<string | null>(null); // Track validation error
 
   const handleMatrixSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const size = parseInt(e.target.value, 10);
     const newMatrix = Array(size)
       .fill(0)
-      .map(() => Array(size + 1).fill(0)); // Create an n x (n + 1) matrix
+      .map(() => Array(size + 1).fill(0));
     setMatrixSize(size);
     setMatrix(newMatrix);
   };
@@ -35,6 +42,7 @@ const SystemResolution: React.FC = () => {
     );
     setMatrix(newMatrix);
   };
+
   const handleClearMatrix = () => {
     const newMatrix = Array(matrixSize)
       .fill(0)
@@ -42,10 +50,29 @@ const SystemResolution: React.FC = () => {
     setMatrix(newMatrix);
     setSolutionMatrix(null);
     setSteps([]);
+    setMatrixType(null);
+    setError(null);
   };
 
   const handleResolution = () => {
-    const result = gaussJordan(matrix);
+    let result;
+
+    switch (matrixType) {
+      case "diagonal":
+        result = resolveDiagonal(matrix);
+        break;
+      case "symmetric":
+        result = resolveSymmetric(matrix);
+        break;
+      case "band":
+        result = resolveBand(matrix);
+        break;
+      case "dense":
+      default:
+        result = gaussJordanWithPivot(matrix);
+        break;
+    }
+
     setSolutionMatrix(result.matrix);
     setSteps(result.steps);
   };
@@ -54,31 +81,27 @@ const SystemResolution: React.FC = () => {
     const matrixString = matrix
       .map((row) => row.map((value) => value.toString()).join("&"))
       .join("\\\\");
-
     return `\\left(\\begin{matrix}${matrixString}\\end{matrix}\\right)`;
   };
 
   const renderSolutionMatrix = () => {
     if (!solutionMatrix) return null;
-
-    // Extract the last column (solutions)
     const solutionColumn = solutionMatrix.map((row) => row[row.length - 1]);
-
-    // Format the solution as a vertical vector
     const matrixString = solutionColumn
       .map((value) => value.toString())
       .join("\\\\");
-
     return `\\left(\\begin{matrix}${matrixString}\\end{matrix}\\right)`;
   };
 
   return (
     <div
+      className="container"
       style={{
-        width: "600vh",
+        width: "600px",
         fontSize: "24px",
-        marginTop: "100px",
-        marginLeft: "600px",
+        marginTop: "50px",
+        marginLeft: "auto",
+        marginRight: "auto",
         textAlign: "justify",
       }}
     >
@@ -90,14 +113,16 @@ const SystemResolution: React.FC = () => {
         onChange={handleMatrixSizeChange}
         min={2}
         max={10}
+        className="form-control mb-3"
+        style={{ width: "100px", margin: "0 auto" }}
       />
 
-      <div style={{ display: "inline-block", margin: "20px 0" }}>
-        <MathJaxContext>
-          <MathJax dynamic>{`\\[ ${renderMatrix()} \\]`}</MathJax>
-        </MathJaxContext>
+      <MathJaxContext>
+        <MathJax dynamic>{`\\[ ${renderMatrix()} \\]`}</MathJax>
+      </MathJaxContext>
 
-        <table style={{ borderCollapse: "separate", borderSpacing: "5px" }}>
+      <div className="table-responsive">
+        <table className="table table-bordered">
           <tbody>
             {matrix.map((row, rowIndex) => (
               <tr key={rowIndex}>
@@ -109,10 +134,7 @@ const SystemResolution: React.FC = () => {
                       onChange={(e) =>
                         handleMatrixChange(e, rowIndex, colIndex)
                       }
-                      style={{
-                        width: "50px",
-                        textAlign: "center",
-                      }}
+                      className="form-control"
                     />
                   </td>
                 ))}
@@ -121,33 +143,64 @@ const SystemResolution: React.FC = () => {
           </tbody>
         </table>
       </div>
-      <br />
-      {/* Matrix type buttons */}
-      <div
-        className="button-container"
-        style={{ display: "flex", gap: "10px", marginBottom: "20px" }}
-      >
-        <button className="btn btn-secondary mt-3">Diagonal</button>
-        <button className="btn btn-secondary mt-3">
-          Symmetric Positive Definite
-        </button>
-        <button className="btn btn-secondary mt-3">Band</button>
+
+      <div className="mb-3">
+        <h5>Select Matrix Type</h5>
+        <div className="form-check">
+          <input
+            type="radio"
+            className="form-check-input"
+            name="matrixType"
+            id="diagonal"
+            value="Diagonal"
+            onChange={() => setMatrixType("Diagonal")}
+          />
+          <label className="form-check-label" htmlFor="diagonal">
+            Diagonal
+          </label>
+        </div>
+        <div className="form-check">
+          <input
+            type="radio"
+            className="form-check-input"
+            name="matrixType"
+            id="symmetricPositiveDefinite"
+            value="Symmetric Positive Definite"
+            onChange={() => setMatrixType("Symmetric Positive Definite")}
+          />
+          <label
+            className="form-check-label"
+            htmlFor="symmetricPositiveDefinite"
+          >
+            Symmetric Positive Definite
+          </label>
+        </div>
+        <div className="form-check">
+          <input
+            type="radio"
+            className="form-check-input"
+            name="matrixType"
+            id="band"
+            value="Band"
+            onChange={() => setMatrixType("Band")}
+          />
+          <label className="form-check-label" htmlFor="band">
+            Band
+          </label>
+        </div>
       </div>
 
-      {/* Resolution Button */}
-      <button
-        className="btn btn-primary mt-3"
-        style={{ backgroundColor: "#007bff", color: "white" }}
-        onClick={handleResolution}
-      >
-        Solve
-      </button>
-      {/* Clear Matrix Button */}
-      <button className="btn btn-danger mt-3 ms-2" onClick={handleClearMatrix}>
-        Clear Matrix
-      </button>
+      {error && <div className="alert alert-danger">{error}</div>}
 
-      {/* Render the solution matrix */}
+      <div className="button-container mt-3">
+        <button className="btn btn-primary" onClick={handleResolution}>
+          Solve
+        </button>
+        <button className="btn btn-danger ms-2" onClick={handleClearMatrix}>
+          Clear Matrix
+        </button>
+      </div>
+
       {solutionMatrix && (
         <div>
           <h2>System Solution</h2>
@@ -155,7 +208,6 @@ const SystemResolution: React.FC = () => {
             <MathJax dynamic>{`\\[ b= ${renderSolutionMatrix()} \\]`}</MathJax>
           </MathJaxContext>
 
-          {/* Toggle button to show/hide steps */}
           <button
             className="btn btn-secondary mt-3"
             onClick={() => setShowSteps(!showSteps)}
@@ -163,19 +215,16 @@ const SystemResolution: React.FC = () => {
             {showSteps ? "Hide Steps" : "Show Steps"}
           </button>
 
-          {/* Conditionally render steps */}
           {showSteps && (
             <div className="steps-container mt-3">
               <h3>Solution Steps</h3>
-              <div className="steps-content">
-                {steps.map((step, index) => (
-                  <div key={index}>
-                    <MathJaxContext>
-                      <MathJax dynamic>{`\\[ ${step} \\]`}</MathJax>
-                    </MathJaxContext>
-                  </div>
-                ))}
-              </div>
+              {steps.map((step, index) => (
+                <div key={index}>
+                  <MathJaxContext>
+                    <MathJax dynamic>{`\\[ ${step} \\]`}</MathJax>
+                  </MathJaxContext>
+                </div>
+              ))}
             </div>
           )}
         </div>

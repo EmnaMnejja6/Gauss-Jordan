@@ -130,7 +130,7 @@ export function invertMatrix(mat: number[][]): number[][] | null {
   return inverseMatrix;
 }
 
-export function gaussJordan(matrix: number[][]): {
+export function gaussJordanWithoutPivot(matrix: number[][]): {
   matrix: number[][]; // The final reduced matrix
   L: number[][]; // The lower triangular matrix (L)
   steps: string[]; // The steps during the calculation
@@ -183,18 +183,29 @@ export function gaussJordan(matrix: number[][]): {
   return { matrix, L, steps };
 }
 
-function jordanWithPivot(a: number[][]): void {
-  const n = a.length;
+export function gaussJordanWithPivot(matrix: number[][]): {
+  matrix: number[][]; // The final reduced matrix
+  L: number[][]; // The lower triangular matrix (L)
+  steps: string[]; // The steps during the calculation
+} {
+  const steps: string[] = [];
+  const n = matrix.length;
   let c = 0;
 
+  // Initialize the L matrix as an identity matrix
+  const L = Array.from({ length: n }, () => Array(n).fill(0));
+  for (let i = 0; i < n; i++) {
+    L[i][i] = 1;
+  }
+
   for (let k = 0; k < n; k++) {
-    let max = Math.abs(a[k][k]);
+    let max = Math.abs(matrix[k][k]);
     let iPivot = k;
 
     // Find the pivot row
     for (let i = k + 1; i < n; i++) {
-      if (Math.abs(a[i][k]) > max) {
-        max = Math.abs(a[i][k]);
+      if (Math.abs(matrix[i][k]) > max) {
+        max = Math.abs(matrix[i][k]);
         iPivot = i;
       }
     }
@@ -202,9 +213,9 @@ function jordanWithPivot(a: number[][]): void {
     // Swap the current row with the pivot row if needed
     if (iPivot !== k) {
       for (let j = 0; j < n + 1; j++) {
-        const temp = a[k][j];
-        a[k][j] = a[iPivot][j];
-        a[iPivot][j] = temp;
+        const temp = matrix[k][j];
+        matrix[k][j] = matrix[iPivot][j];
+        matrix[iPivot][j] = temp;
       }
     }
 
@@ -212,14 +223,14 @@ function jordanWithPivot(a: number[][]): void {
 
     // Normalize the pivot row
     for (let j = k + 1; j < n + 1; j++) {
-      a[k][j] = a[k][j] / a[k][k];
+      matrix[k][j] = matrix[k][j] / matrix[k][k];
       c += 1;
     }
 
     // Eliminate above the pivot
     for (let i = 0; i < k; i++) {
       for (let j = k + 1; j < n + 1; j++) {
-        a[i][j] = a[i][j] - a[i][k] * a[k][j];
+        matrix[i][j] = matrix[i][j] - matrix[i][k] * matrix[k][j];
         c += 2;
       }
     }
@@ -227,17 +238,13 @@ function jordanWithPivot(a: number[][]): void {
     // Eliminate below the pivot
     for (let i = k + 1; i < n; i++) {
       for (let j = k + 1; j < n + 1; j++) {
-        a[i][j] = a[i][j] - a[i][k] * a[k][j];
+        matrix[i][j] = matrix[i][j] - matrix[i][k] * matrix[k][j];
         c += 2;
       }
     }
-
-    // Output the current state of the matrix
-    for (let i = 0; i < n; i++) {
-      console.log(a[i].join("\t"));
-    }
-    console.log("\n");
   }
+
+  return { matrix, L, steps };
 }
 
 // Format a matrix as a LaTeX bmatrix string
@@ -282,4 +289,43 @@ export function inverseMatrix(matrix: number[][]): number[][] | null {
   }
 
   return inv; // Return the inverse matrix
+}
+
+export function resolveDiagonal(matrix: number[][]): {
+  matrix: number[][]; // The final reduced matrix
+  L: number[][]; // The lower triangular matrix (L)
+  steps: string[]; // The steps during the calculation
+} {
+  const isDominant = isDiagonallyDominant(matrix);
+
+  if (!isDominant) {
+    throw new Error("The matrix is not diagonally dominant.");
+  }
+
+  return gaussJordanWithoutPivot(matrix);
+}
+
+export function resolveSymmetric(matrix: number[][]): {
+  matrix: number[][]; // The final reduced matrix
+  L: number[][]; // The lower triangular matrix (L)
+  steps: string[]; // The steps during the calculation
+} {
+  if (!isSymmetric) {
+    throw new Error("The matrix is not Symmetric definite positive.");
+  }
+
+  return gaussJordanWithoutPivot(matrix);
+}
+
+export function resolveBand(matrix: number[][]): {
+  matrix: number[][]; // The final reduced matrix
+  L: number[][]; // The lower triangular matrix (L)
+  steps: string[]; // The steps during the calculation
+} {
+  /* rigel dinomha
+  if (!isBand) {
+    throw new Error("The matrix is not diagonally dominant.");
+  }
+*/
+  return gaussJordanWithoutPivot(matrix);
 }
