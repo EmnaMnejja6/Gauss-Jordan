@@ -237,6 +237,7 @@ export function gaussJordanWithPivot(matrix: number[][]): {
   for (let k = 0; k < n; k++) {
     let max = Math.abs(matrix[k][k]);
     let iPivot = k;
+    console.log(`Étape ${k + 1}: Chercher le pivot maximum dans la colonne ${k}`);
     
     for (let i = k + 1; i < n; i++) {
       if (Math.abs(matrix[i][k]) > max) {
@@ -244,63 +245,67 @@ export function gaussJordanWithPivot(matrix: number[][]): {
         iPivot = i;
       }
     }
-  
+
     if (iPivot !== k) {
       [matrix[k], matrix[iPivot]] = [matrix[iPivot], matrix[k]];
       steps.push(`\\text{Permuter la ligne ${k + 1} avec ${iPivot + 1}}`);
+      console.log(`Permutation des lignes ${k + 1} et ${iPivot + 1}`);
     }
-  
+    
     const pivot = matrix[k][k];
+    if (pivot === 0) {
+      steps.push(`\\text{Le pivot à la position (${k + 1}, ${k + 1}) est nul. Résolution impossible avec ce pivot.}`);
+      console.error(`Pivot nul à la position (${k + 1}, ${k + 1})`);
+      throw new Error("Pivot nul détecté");
+    }
+
+    console.log(`Normalisation de la ligne ${k + 1} avec le pivot ${pivot}`);
     steps.push(
-      `\\text{Normalisation de la ligne ${
-        k + 1
-      } en divisant par le pivot } ${pivot}.`
+      `\\text{Normalisation de la ligne ${k + 1} en divisant par le pivot } ${pivot}.`
     );
     for (let j = k; j < n + 1; j++) {
       matrix[k][j] /= pivot;
     }
-  
+
     steps.push(
       `\\left(\\begin{matrix} ${formatAugmentedMatrix(matrix)} \\end{matrix}\\right)`
     );
-  
+    console.log(`Matrice après normalisation de la ligne ${k + 1}:`, matrix);
+
+    // Opérations sur les lignes ci-dessous
     for (let i = 0; i < k; i++) {
       const multiplier = matrix[i][k];
       for (let j = k; j < n + 1; j++) {
         matrix[i][j] -= multiplier * matrix[k][j];
       }
-  
+
       // Log after each row operation
       steps.push(
-        `\\text{Row operation } r_${i + 1} - (${toFraction(multiplier)}) r_${
-          k + 1
-        }`
+        `\\text{Row operation } r_${i + 1} - (${toFraction(multiplier)}) r_${k + 1}`
       );
       steps.push(
         `\\left(\\begin{matrix} ${formatAugmentedMatrix(matrix)} \\end{matrix}\\right)`
       );
     }
-  
+
     for (let i = k + 1; i < n; i++) {
       const multiplier = matrix[i][k];
       for (let j = k; j < n + 1; j++) {
         matrix[i][j] -= multiplier * matrix[k][j];
       }
-  
+
       steps.push(
-        `\\text{Row operation } r_${i + 1} - (${toFraction(multiplier)}) r_${
-          k + 1
-        }`
+        `\\text{Row operation } r_${i + 1} - (${toFraction(multiplier)}) r_${k + 1}`
       );
       steps.push(
         `\\left(\\begin{matrix} ${formatAugmentedMatrix(matrix)} \\end{matrix}\\right)`
       );
     }
   }
-  
 
   return { matrix, steps };
 }
+
 
 // Helper function to format numbers as fractions or integers
 function toFraction(value: number): string {
