@@ -38,7 +38,7 @@ export function isPositiveDefinite(mat: number[][]): boolean {
   }
   return true;
 }
-function augmentMatrix(mat: number[][]): number[][] {
+export function augmentMatrix(mat: number[][]): number[][] {
   const n = mat.length;
   return mat.map((row, i) => [
     ...row,
@@ -132,71 +132,93 @@ export function invertMatrix(mat: number[][]): number[][] | null {
 
 export function gaussJordanWithoutPivot(matrix: number[][]): {
   matrix: number[][]; // The final reduced matrix
-  L: number[][]; // The lower triangular matrix (L)
-  steps: string[]; // The steps during the calculation
+  steps: string[]; // The steps during the calculation, showing augmented matrix
 } {
   const steps: string[] = [];
   const n = matrix.length;
-
-  // Initialize the L matrix as an identity matrix
-  const L = Array.from({ length: n }, () => Array(n).fill(0));
-  for (let i = 0; i < n; i++) {
-    L[i][i] = 1;
-  }
 
   for (let k = 0; k < n; k++) {
     // Normalize row k
     const pivot = matrix[k][k];
     if (pivot === 0) {
-      steps.push(`Pivot is zero at iteration ${k + 1}, matrix is singular.`);
-      return { matrix, L, steps };
+      steps.push(`\\text{Pivot est zero ${k + 1}, matrice is singuliere.}`);
+      return { matrix, steps };
     }
 
     // Normalize the pivot row
     for (let j = k; j < n + 1; j++) {
       matrix[k][j] /= pivot;
     }
-    L[k][k] = 1;
 
     // Log after normalization
-    steps.push(`\\text{Iteration ${k + 1}: Normalize row ${k}}`);
-    steps.push(`A = ${formatMatrix(matrix)}`);
-    steps.push(`L = ${formatMatrix(L)}`);
+    steps.push(`\\text{Normalize } r_${k + 1}`);
+    steps.push(
+      `\\left(\\begin{matrix} ${formatAugmentedMatrix(
+        matrix
+      )} \\end{matrix}\\right)`
+    );
 
     // Eliminate column k for all rows i ≠ k
     for (let i = 0; i < n; i++) {
       if (i !== k) {
-        L[i][k] = matrix[i][k]; // Store the multiplier in L
-        for (let j = k + 1; j < n + 1; j++) {
-          matrix[i][j] -= matrix[i][k] * matrix[k][j]; // Eliminate the element
+        const multiplier = matrix[i][k];
+        for (let j = k; j < n + 1; j++) {
+          matrix[i][j] -= multiplier * matrix[k][j];
         }
         matrix[i][k] = 0; // Set the eliminated element to zero
+
+        // Log after each row operation
+        steps.push(
+          `\\text{Row operation } r_${i + 1} - (${toFraction(multiplier)}) r_${
+            k + 1
+          }`
+        );
+        steps.push(
+          `\\left(\\begin{matrix} ${formatAugmentedMatrix(
+            matrix
+          )} \\end{matrix}\\right)`
+        );
       }
     }
-
-    // Log after elimination
-    steps.push(`\\text{Iteration ${k + 1}: Eliminate column ${k}}`);
-    steps.push(`A = ${formatMatrix(matrix)}`);
-    steps.push(`L = ${formatMatrix(L)}`);
   }
 
-  return { matrix, L, steps };
+  return { matrix, steps };
 }
+
+// Helper function to format the augmented matrix for LaTeX display
+function formatAugmentedMatrix(matrix: number[][]): string {
+  return matrix
+    .map(
+      (row) =>
+        row
+          .slice(0, -1) // Get all elements except the last one
+          .map((value) => toFraction(value))
+          .join(" & ") +
+        " & | & " +
+        toFraction(row[row.length - 1]) // Add the last element with a separator
+    )
+    .join(" \\\\ ");
+}
+
+// Helper function to find the greatest common divisor
+function greatestCommonDivisor(a: number, b: number): number {
+  return b === 0 ? a : greatestCommonDivisor(b, a % b);
+}
+
+/*
+// Helper function to format the augmented matrix for LaTeX display
+export function formatAugmentedMatrix(matrix: number[][]): string {
+  return matrix
+    .map((row) => row.map((value) => value.toFixed(2)).join(" & "))
+    .join(" \\\\ ");
+}*/
 
 export function gaussJordanWithPivot(matrix: number[][]): {
   matrix: number[][]; // The final reduced matrix
-  L: number[][]; // The lower triangular matrix (L)
-  steps: string[]; // The steps during the calculation
+  steps: string[]; // The steps during the calculation in LaTeX format
 } {
   const steps: string[] = [];
   const n = matrix.length;
-  let c = 0;
-
-  // Initialize the L matrix as an identity matrix
-  const L = Array.from({ length: n }, () => Array(n).fill(0));
-  for (let i = 0; i < n; i++) {
-    L[i][i] = 1;
-  }
 
   for (let k = 0; k < n; k++) {
     let max = Math.abs(matrix[k][k]);
@@ -212,43 +234,97 @@ export function gaussJordanWithPivot(matrix: number[][]): {
 
     // Swap the current row with the pivot row if needed
     if (iPivot !== k) {
-      for (let j = 0; j < n + 1; j++) {
-        const temp = matrix[k][j];
-        matrix[k][j] = matrix[iPivot][j];
-        matrix[iPivot][j] = temp;
-      }
+      [matrix[k], matrix[iPivot]] = [matrix[iPivot], matrix[k]];
+      steps.push(`\\text{Permuter la ligne ${k + 1} avec ${iPivot + 1}}`);
     }
-
-    console.log(`Iteration k = ${k}`);
 
     // Normalize the pivot row
-    for (let j = k + 1; j < n + 1; j++) {
-      matrix[k][j] = matrix[k][j] / matrix[k][k];
-      c += 1;
+
+    const pivot = matrix[k][k];
+    steps.push(
+      `\\text{Normalisation de la ligne ${
+        k + 1
+      } en divisant par le pivot } ${pivot}.`
+    );
+    for (let j = k; j < n + 1; j++) {
+      matrix[k][j] /= pivot;
     }
 
-    // Eliminate above the pivot
-    for (let i = 0; i < k; i++) {
-      for (let j = k + 1; j < n + 1; j++) {
-        matrix[i][j] = matrix[i][j] - matrix[i][k] * matrix[k][j];
-        c += 2;
-      }
-    }
-
-    // Eliminate below the pivot
+    steps.push(
+      `\\left(\\begin{matrix} ${formatAugmentedMatrix(
+        matrix
+      )} \\end{matrix}\\right)`
+    );
+    // Eliminate entries below the pivot
     for (let i = k + 1; i < n; i++) {
-      for (let j = k + 1; j < n + 1; j++) {
-        matrix[i][j] = matrix[i][j] - matrix[i][k] * matrix[k][j];
-        c += 2;
+      const factor = matrix[i][k];
+      steps.push(
+        `\\text{Élimination de l'entrée dans la ligne ${i + 1}, colonne ${
+          k + 1
+        } en utilisant le facteur } ${factor}.`
+      );
+      for (let j = k; j < n + 1; j++) {
+        matrix[i][j] -= factor * matrix[k][j];
       }
+      steps.push(
+        `\\left(\\begin{matrix} ${formatAugmentedMatrix(
+          matrix
+        )} \\end{matrix}\\right)`
+      );
     }
   }
 
-  return { matrix, L, steps };
+  // Eliminate entries above the pivot
+  for (let k = n - 1; k >= 0; k--) {
+    for (let i = k - 1; i >= 0; i--) {
+      const factor = matrix[i][k];
+      steps.push(
+        `\\text{Eliminating entry in row ${i + 1}, column ${
+          k + 1
+        } using factor } ${factor}.`
+      );
+      for (let j = k; j < n + 1; j++) {
+        matrix[i][j] -= factor * matrix[k][j];
+      }
+      steps.push(
+        `\\text{Row ${i} after elimination: } ${matrix[i]
+          .map(toFraction)
+          .join(", ")}.`
+      );
+    }
+  }
+
+  return { matrix, steps };
+}
+
+// Helper function to format numbers as fractions or integers
+function toFraction(value: number): string {
+  if (Number.isInteger(value)) {
+    return value.toString();
+  } else {
+    const tolerance = 1e-6;
+    let numerator = value;
+    let denominator = 1;
+
+    while (Math.abs(numerator - Math.round(numerator)) > tolerance) {
+      numerator *= 10;
+      denominator *= 10;
+    }
+
+    const gcd = greatestCommonDivisor(Math.round(numerator), denominator);
+    numerator = Math.round(numerator) / gcd;
+    denominator = denominator / gcd;
+
+    if (denominator === 1) {
+      return numerator.toString();
+    } else {
+      return `\\frac{${numerator}}{${denominator}}`;
+    }
+  }
 }
 
 // Format a matrix as a LaTeX bmatrix string
-function formatMatrix(matrix: number[][]): string {
+export function formatMatrix(matrix: number[][]): string {
   return `\\begin{bmatrix} ${matrix
     .map((row) => row.join(" & "))
     .join(" \\\\ ")} \\end{bmatrix}`;
@@ -293,7 +369,6 @@ export function inverseMatrix(matrix: number[][]): number[][] | null {
 
 export function resolveDiagonal(matrix: number[][]): {
   matrix: number[][]; // The final reduced matrix
-  L: number[][]; // The lower triangular matrix (L)
   steps: string[]; // The steps during the calculation
 } {
   const isDominant = isDiagonallyDominant(matrix);
@@ -305,12 +380,11 @@ export function resolveDiagonal(matrix: number[][]): {
   return gaussJordanWithoutPivot(matrix);
 }
 
-export function resolveSymmetric(matrix: number[][]): {
+export function resolveSymmetricPositiveDefinite(matrix: number[][]): {
   matrix: number[][]; // The final reduced matrix
-  L: number[][]; // The lower triangular matrix (L)
   steps: string[]; // The steps during the calculation
 } {
-  if (!isSymmetric) {
+  if (!(isSymmetric(matrix) && isPositiveDefinite(matrix))) {
     throw new Error("The matrix is not Symmetric definite positive.");
   }
 
@@ -319,7 +393,6 @@ export function resolveSymmetric(matrix: number[][]): {
 
 export function resolveBand(matrix: number[][]): {
   matrix: number[][]; // The final reduced matrix
-  L: number[][]; // The lower triangular matrix (L)
   steps: string[]; // The steps during the calculation
 } {
   /* rigel dinomha

@@ -6,6 +6,7 @@ import {
   resolveDiagonal,
   resolveSymmetric,
   resolveBand,
+  resolveSymmetricPositiveDefinite,
 } from "../utils/matrixCalculations";
 
 const SystemResolution: React.FC = () => {
@@ -16,8 +17,8 @@ const SystemResolution: React.FC = () => {
   const [solutionMatrix, setSolutionMatrix] = useState<number[][] | null>(null);
   const [steps, setSteps] = useState<string[]>([]);
   const [showSteps, setShowSteps] = useState<boolean>(true);
-  const [matrixType, setMatrixType] = useState<string | null>(null); // Track selected matrix type
-  const [error, setError] = useState<string | null>(null); // Track validation error
+  const [matrixType, setMatrixType] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleMatrixSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const size = parseInt(e.target.value, 10);
@@ -56,13 +57,13 @@ const SystemResolution: React.FC = () => {
 
   const handleResolution = () => {
     let result;
-
-    switch (matrixType) {
+    result = gaussJordanWithPivot(matrix);
+    /*switch (matrixType) {
       case "diagonal":
         result = resolveDiagonal(matrix);
         break;
       case "symmetric":
-        result = resolveSymmetric(matrix);
+        result = resolveSymmetricPositiveDefinite(matrix);
         break;
       case "band":
         result = resolveBand(matrix);
@@ -72,7 +73,7 @@ const SystemResolution: React.FC = () => {
         result = gaussJordanWithPivot(matrix);
         break;
     }
-
+    */
     setSolutionMatrix(result.matrix);
     setSteps(result.steps);
   };
@@ -99,8 +100,8 @@ const SystemResolution: React.FC = () => {
       style={{
         width: "600px",
         fontSize: "24px",
-        marginTop: "50px",
-        marginLeft: "auto",
+        marginTop: "65px",
+        marginLeft: "500px",
         marginRight: "auto",
         textAlign: "justify",
       }}
@@ -156,7 +157,7 @@ const SystemResolution: React.FC = () => {
             onChange={() => setMatrixType("Diagonal")}
           />
           <label className="form-check-label" htmlFor="diagonal">
-            Diagonal
+            Diagonal Dominant
           </label>
         </div>
         <div className="form-check">
@@ -185,7 +186,20 @@ const SystemResolution: React.FC = () => {
             onChange={() => setMatrixType("Band")}
           />
           <label className="form-check-label" htmlFor="band">
-            Band
+            Bande
+          </label>
+        </div>
+        <div className="form-check">
+          <input
+            type="radio"
+            className="form-check-input"
+            name="matrixType"
+            id="band"
+            value="Band"
+            onChange={() => setMatrixType("Band")}
+          />
+          <label className="form-check-label" htmlFor="dense">
+            Dense
           </label>
         </div>
       </div>
