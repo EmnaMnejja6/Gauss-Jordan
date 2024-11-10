@@ -158,29 +158,43 @@ export function gaussJordanWithoutPivot(matrix: number[][]): {
       )} \\end{matrix}\\right)`
     );
 
-    // Eliminate column k for all rows i ≠ k
-    for (let i = 0; i < n; i++) {
-      if (i !== k) {
-        const multiplier = matrix[i][k];
-        for (let j = k; j < n + 1; j++) {
-          matrix[i][j] -= multiplier * matrix[k][j];
-        }
-        matrix[i][k] = 0; // Set the eliminated element to zero
-
-        // Log after each row operation
-        steps.push(
-          `\\text{Row operation } r_${i + 1} - (${toFraction(multiplier)}) r_${
-            k + 1
-          }`
-        );
-        steps.push(
-          `\\left(\\begin{matrix} ${formatAugmentedMatrix(
-            matrix
-          )} \\end{matrix}\\right)`
-        );
+    
+    for (let i = 0; i < k; i++) {
+      const multiplier = matrix[i][k];
+      for (let j = k; j < n + 1; j++) {
+        matrix[i][j] -= multiplier * matrix[k][j];
       }
+
+      // Log after each row operation
+      steps.push(
+        `\\text{Row operation } r_${i + 1} - (${toFraction(multiplier)}) r_${
+          k + 1
+        }`
+      );
+      steps.push(
+        `\\left(\\begin{matrix} ${formatAugmentedMatrix(matrix)} \\end{matrix}\\right)`
+      );
     }
-  }
+
+    for (let i = k + 1; i < n; i++) {
+      const multiplier = matrix[i][k];
+      for (let j = k; j < n + 1; j++) {
+        matrix[i][j] -= multiplier * matrix[k][j];
+      }
+      
+
+      // Log after each row operation
+      steps.push(
+        `\\text{Row operation } r_${i + 1} - (${toFraction(multiplier)}) r_${
+          k + 1
+        }`
+      );
+      steps.push(
+        `\\left(\\begin{matrix} ${formatAugmentedMatrix(matrix)} \\end{matrix}\\right)`
+      );
+    }
+
+      }
 
   return { matrix, steps };
 }
@@ -219,27 +233,23 @@ export function gaussJordanWithPivot(matrix: number[][]): {
 } {
   const steps: string[] = [];
   const n = matrix.length;
-
+  
   for (let k = 0; k < n; k++) {
     let max = Math.abs(matrix[k][k]);
     let iPivot = k;
-
-    // Find the pivot row
+    
     for (let i = k + 1; i < n; i++) {
       if (Math.abs(matrix[i][k]) > max) {
         max = Math.abs(matrix[i][k]);
         iPivot = i;
       }
     }
-
-    // Swap the current row with the pivot row if needed
+  
     if (iPivot !== k) {
       [matrix[k], matrix[iPivot]] = [matrix[iPivot], matrix[k]];
       steps.push(`\\text{Permuter la ligne ${k + 1} avec ${iPivot + 1}}`);
     }
-
-    // Normalize the pivot row
-
+  
     const pivot = matrix[k][k];
     steps.push(
       `\\text{Normalisation de la ligne ${
@@ -249,51 +259,45 @@ export function gaussJordanWithPivot(matrix: number[][]): {
     for (let j = k; j < n + 1; j++) {
       matrix[k][j] /= pivot;
     }
-
+  
     steps.push(
-      `\\left(\\begin{matrix} ${formatAugmentedMatrix(
-        matrix
-      )} \\end{matrix}\\right)`
+      `\\left(\\begin{matrix} ${formatAugmentedMatrix(matrix)} \\end{matrix}\\right)`
     );
-    // Eliminate entries below the pivot
+  
+    for (let i = 0; i < k; i++) {
+      const multiplier = matrix[i][k];
+      for (let j = k; j < n + 1; j++) {
+        matrix[i][j] -= multiplier * matrix[k][j];
+      }
+  
+      // Log after each row operation
+      steps.push(
+        `\\text{Row operation } r_${i + 1} - (${toFraction(multiplier)}) r_${
+          k + 1
+        }`
+      );
+      steps.push(
+        `\\left(\\begin{matrix} ${formatAugmentedMatrix(matrix)} \\end{matrix}\\right)`
+      );
+    }
+  
     for (let i = k + 1; i < n; i++) {
-      const factor = matrix[i][k];
-      steps.push(
-        `\\text{Élimination de l'entrée dans la ligne ${i + 1}, colonne ${
-          k + 1
-        } en utilisant le facteur } ${factor}.`
-      );
+      const multiplier = matrix[i][k];
       for (let j = k; j < n + 1; j++) {
-        matrix[i][j] -= factor * matrix[k][j];
+        matrix[i][j] -= multiplier * matrix[k][j];
       }
+  
       steps.push(
-        `\\left(\\begin{matrix} ${formatAugmentedMatrix(
-          matrix
-        )} \\end{matrix}\\right)`
-      );
-      
-    }
-  }
-
-  // Eliminate entries above the pivot
-  for (let k = n - 1; k >= 0; k--) {
-    for (let i = k - 1; i >= 0; i--) {
-      const factor = matrix[i][k];
-      steps.push(
-        `\\text{Eliminating entry in row ${i + 1}, column ${
+        `\\text{Row operation } r_${i + 1} - (${toFraction(multiplier)}) r_${
           k + 1
-        } using factor } ${factor}.`
+        }`
       );
-      for (let j = k; j < n + 1; j++) {
-        matrix[i][j] -= factor * matrix[k][j];
-      }
       steps.push(
-        `\\left(\\begin{matrix} ${formatAugmentedMatrix(
-          matrix
-        )} \\end{matrix}\\right)`
+        `\\left(\\begin{matrix} ${formatAugmentedMatrix(matrix)} \\end{matrix}\\right)`
       );
     }
   }
+  
 
   return { matrix, steps };
 }
