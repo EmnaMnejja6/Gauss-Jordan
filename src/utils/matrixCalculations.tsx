@@ -271,6 +271,7 @@ export function gaussJordanWithPivot(matrix: number[][]): {
           matrix
         )} \\end{matrix}\\right)`
       );
+      
     }
   }
 
@@ -287,9 +288,9 @@ export function gaussJordanWithPivot(matrix: number[][]): {
         matrix[i][j] -= factor * matrix[k][j];
       }
       steps.push(
-        `\\text{Row ${i} after elimination: } ${matrix[i]
-          .map(toFraction)
-          .join(", ")}.`
+        `\\left(\\begin{matrix} ${formatAugmentedMatrix(
+          matrix
+        )} \\end{matrix}\\right)`
       );
     }
   }
