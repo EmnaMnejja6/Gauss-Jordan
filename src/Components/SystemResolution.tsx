@@ -57,52 +57,52 @@ const SystemResolution: React.FC = () => {
     //
     setFileImported(false);
   };
-
-  /*const handleResolution = () => {
-    let result;
-    result = gaussJordanWithPivot(matrix);
-    /*switch (matrixType) {
-      case "diagonal":
-        result = resolveDiagonal(matrix);
-        break;
-      case "symmetric":
-        result = resolveSymmetricPositiveDefinite(matrix);
-        break;
-      case "band":
-        result = resolveBand(matrix);
-        break;
-      case "dense":
-      default:
-        result = gaussJordanWithPivot(matrix);
-        break;
-    }
-    */
-    /*setSolutionMatrix(result.matrix);
-    setSteps(result.steps);
-  };*/
   const handleResolution = () => {
     try {
-      const matrixCopy = matrix.map(row => [...row]); // Crée une copie indépendante de la matrice
-      const result = gaussJordanWithPivot(matrixCopy);
+      const matrixCopy = matrix.map((row) => [...row]);
+      let result;
+
+      switch (matrixType) {
+        case "Diagonal":
+          result = resolveDiagonal(matrixCopy);
+          break;
+        case "Symmetric Positive Definite":
+          result = resolveSymmetricPositiveDefinite(matrixCopy);
+          break;
+        case "Band":
+          result = resolveBand(matrixCopy);
+          break;
+        case "Dense":
+        default:
+          result = gaussJordanWithPivot(matrixCopy);
+          break;
+      }
+
       setSolutionMatrix(result.matrix);
       setSteps(result.steps);
-      setShowSteps(!(fileImported && matrixSize > 10)); 
+      setShowSteps(!(fileImported && matrixSize > 10));
     } catch (error) {
       setError("Erreur lors de la résolution.");
     }
   };
-  
+
   const handleRandomMatrix = () => {
     const newMatrix = Array(matrixSize)
       .fill(0)
-      .map(() => Array(matrixSize + 1).fill(0).map(() => Math.floor(Math.random() * 20) - 10)); // Random values between -10 and 10
+      .map(() =>
+        Array(matrixSize + 1)
+          .fill(0)
+          .map(() => Math.floor(Math.random() * 20) - 10)
+      ); // Random values between -10 and 10
+
     setMatrix(newMatrix);
     setSolutionMatrix(null);
     setSteps([]);
     setFileImported(false);
-  
+    setMatrixType("Dense");
+
     try {
-      const matrixCopy1 = newMatrix.map(row => [...row]);
+      const matrixCopy1 = newMatrix.map((row) => [...row]);
       const result = gaussJordanWithPivot(matrixCopy1);
       setSolutionMatrix(result.matrix);
       setSteps(result.steps);
@@ -111,8 +111,7 @@ const SystemResolution: React.FC = () => {
       setError("Erreur lors de la résolution.");
     }
   };
-  
-  
+
   const renderMatrix = () => {
     const matrixString = matrix
       .map((row) => row.map((value) => value.toString()).join("&"))
@@ -129,7 +128,6 @@ const SystemResolution: React.FC = () => {
     return `\\left(\\begin{matrix}${matrixString}\\end{matrix}\\right)`;
   };
 
-  
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -138,16 +136,18 @@ const SystemResolution: React.FC = () => {
         const content = event.target?.result as string;
         const values = lireFichier(content);
         const n = Math.floor(Math.sqrt(values.length)); // Essaye de trouver la dimension n
-      if (n * (n + 1) !== values.length) {
-        setError("Le fichier n'est pas de la forme n*(n+1) ou contient trop peu de valeurs.");
-        return;
-      }
+        if (n * (n + 1) !== values.length) {
+          setError(
+            "Le fichier n'est pas de la forme n*(n+1) ou contient trop peu de valeurs."
+          );
+          return;
+        }
 
-      // Forme la matrice avec les valeurs filtrées
-      const matrix = [];
-      for (let i = 0; i < n; i++) {
-        matrix.push(values.slice(i * (n + 1), (i + 1) * (n + 1)));
-      }
+        // Forme la matrice avec les valeurs filtrées
+        const matrix = [];
+        for (let i = 0; i < n; i++) {
+          matrix.push(values.slice(i * (n + 1), (i + 1) * (n + 1)));
+        }
         setMatrixSize(n);
         setMatrix(matrix);
         setSolutionMatrix(null);
@@ -166,8 +166,6 @@ const SystemResolution: React.FC = () => {
       .map((val) => parseFloat(val))
       .filter((num) => !isNaN(num));
   };
-  
-  
 
   return (
     <div
@@ -181,8 +179,8 @@ const SystemResolution: React.FC = () => {
         textAlign: "justify",
       }}
     >
-      <h2>Matrix Input</h2>
-      <label>Matrix Size: </label>
+      <h2>Saisie de la matrice augmentée</h2>
+      <label>Taille de la matrice: </label>
       <input
         type="number"
         value={matrixSize}
@@ -221,7 +219,21 @@ const SystemResolution: React.FC = () => {
       </div>
 
       <div className="mb-3">
-        <h5>Select Matrix Type</h5>
+        <h5>Choisir le type de matrice</h5>
+        <div className="form-check">
+          <input
+            type="radio"
+            className="form-check-input"
+            name="matrixType"
+            id="band"
+            value="Band"
+            onChange={() => setMatrixType("")}
+          />
+          <label className="form-check-label" htmlFor="dense">
+            Dense
+          </label>
+        </div>
+
         <div className="form-check">
           <input
             type="radio"
@@ -232,7 +244,7 @@ const SystemResolution: React.FC = () => {
             onChange={() => setMatrixType("Diagonal")}
           />
           <label className="form-check-label" htmlFor="diagonal">
-            Diagonal Dominant
+            A diagonale dominante
           </label>
         </div>
         <div className="form-check">
@@ -248,7 +260,7 @@ const SystemResolution: React.FC = () => {
             className="form-check-label"
             htmlFor="symmetricPositiveDefinite"
           >
-            Symmetric Positive Definite
+            Symmetrique définie positive
           </label>
         </div>
         <div className="form-check">
@@ -264,29 +276,16 @@ const SystemResolution: React.FC = () => {
             Bande
           </label>
         </div>
-        <div className="form-check">
-          <input
-            type="radio"
-            className="form-check-input"
-            name="matrixType"
-            id="band"
-            value="Band"
-            onChange={() => setMatrixType("Band")}
-          />
-          <label className="form-check-label" htmlFor="dense">
-            Dense
-          </label>
-        </div>
       </div>
 
       {error && <div className="alert alert-danger">{error}</div>}
 
       <div className="button-container mt-3">
         <button className="btn btn-primary" onClick={handleResolution}>
-          Solve
+          Résolution
         </button>
         <button className="btn btn-danger ms-2" onClick={handleClearMatrix}>
-          Clear Matrix
+          Effacer
         </button>
         <input
           type="file"
@@ -295,13 +294,13 @@ const SystemResolution: React.FC = () => {
           className="btn btn-secondary ms-2"
         />
         <button className="btn btn-warning ms-2" onClick={handleRandomMatrix}>
-          Random Matrix
+          Matrice aléatoire
         </button>
       </div>
 
       {solutionMatrix && (
         <div>
-          <h2>System Solution</h2>
+          <h2>Résolution du système</h2>
           <MathJaxContext>
             <MathJax dynamic>{`\\[ b= ${renderSolutionMatrix()} \\]`}</MathJax>
           </MathJaxContext>

@@ -219,17 +219,9 @@ function greatestCommonDivisor(a: number, b: number): number {
   return b === 0 ? a : greatestCommonDivisor(b, a % b);
 }
 
-/*
-// Helper function to format the augmented matrix for LaTeX display
-export function formatAugmentedMatrix(matrix: number[][]): string {
-  return matrix
-    .map((row) => row.map((value) => value.toFixed(2)).join(" & "))
-    .join(" \\\\ ");
-}*/
-
 export function gaussJordanWithPivot(matrix: number[][]): {
-  matrix: number[][]; // The final reduced matrix
-  steps: string[]; // The steps during the calculation in LaTeX format
+  matrix: number[][]; 
+  steps: string[]; 
 } {
   const steps: string[] = [];
   const n = matrix.length;
@@ -307,7 +299,6 @@ export function gaussJordanWithPivot(matrix: number[][]): {
 }
 
 
-// Helper function to format numbers as fractions or integers
 function toFraction(value: number): string {
   if (Number.isInteger(value)) {
     return value.toString();
@@ -333,7 +324,6 @@ function toFraction(value: number): string {
   }
 }
 
-// Format a matrix as a LaTeX bmatrix string
 export function formatMatrix(matrix: number[][]): string {
   return `\\begin{bmatrix} ${matrix
     .map((row) => row.join(" & "))
@@ -382,8 +372,8 @@ export function resolveDiagonal(matrix: number[][]): {
   steps: string[]; // The steps during the calculation
 } {
   const isDominant = isDiagonallyDominant(matrix);
-
-  if (!isDominant) {
+  
+  if (!isDiagonallyDominant(matrix)) {
     throw new Error("The matrix is not diagonally dominant.");
   }
 
