@@ -45,84 +45,86 @@ const Cours = () => {
           alignItems: "center",
         }}
       >
-        <h2>Gauss-Jordan Elimination Method</h2>
+        <h2>Méthode d'élimination de Gauss-Jordan</h2>
         <p>
-          The Gauss-Jordan elimination method is a process to solve systems of
-          linear equations by transforming a given matrix into its reduced row
-          echelon form (RREF). It extends Gaussian elimination by further
-          reducing the matrix to make it easier to solve for the unknown
-          variables.
+          La méthode d'élimination de Gauss-Jordan est un processus pour
+          résoudre des systèmes d'équations linéaires en transformant une
+          matrice donnée en sa forme échelonnée réduite (RREF). Elle étend
+          l'élimination de Gauss en réduisant davantage la matrice pour rendre
+          la résolution des variables inconnues plus facile.
         </p>
 
-        <h3>Step-by-Step Explanation</h3>
+        <h3>Explication étape par étape</h3>
         <p>
-          In this method, we use elementary row operations to reduce the matrix
-          to a form where the leading entry in each row is 1, and all entries
-          above and below the leading entry are 0. The three row operations are:
+          Dans cette méthode, nous utilisons des opérations élémentaires sur les
+          lignes pour réduire la matrice à une forme où l'élément principal dans
+          chaque ligne est 1, et tous les éléments au-dessus et en dessous de
+          l'élément principal sont 0. Les trois opérations sur les lignes sont:
         </p>
         <ol>
-          <li>Swapping two rows</li>
-          <li>Multiplying a row by a non-zero scalar</li>
-          <li>Adding or subtracting multiples of a row to another row</li>
+          <li>Échanger deux lignes</li>
+          <li>Multiplier une ligne par un scalaire non nul</li>
+          <li>Ajouter ou soustraire des multiples d'une ligne à une autre ligne</li>
         </ol>
 
-        <h3>Example</h3>
+        <h3>Exemple</h3>
         <p>
-          Consider the system of linear equations represented by the following
-          augmented matrix:
+          Considérons le système d'équations linéaires représenté par la matrice
+          augmentée suivante :
         </p>
         <MathJax>{`\\[ ${exampleMatrix} \\]`}</MathJax>
 
         <p>
-          Step 1: Make the first element in the first row equal to 1 by dividing
-          the first row by 2:
+          Étape 1 : Faites en sorte que le premier élément de la première ligne
+          soit égal à 1 en divisant la première ligne par 2 :
         </p>
         <MathJax>{`\\[ ${step1} \\]`}</MathJax>
 
         <p>
-          Step 2: Use the first row to eliminate the elements below the pivot in
-          the first column:
+          Étape 2 : Utilisez la première ligne pour éliminer les éléments en
+          dessous du pivot dans la première colonne :
         </p>
         <MathJax>{`\\[ ${step2} \\]`}</MathJax>
 
         <p>
-          Step 3: Continue the elimination process to obtain the reduced row
-          echelon form (RREF):
+          Étape 3 : Continuez le processus d'élimination pour obtenir la forme
+          échelonnée réduite (RREF) :
         </p>
         <MathJax>{`\\[ ${finalStep} \\]`}</MathJax>
 
         <p>
-          From this reduced row echelon form, the solutions to the system of
-          equations are:
-          <strong> x = 2, y = 3, z = -1</strong>.
+          À partir de cette forme échelonnée réduite, les solutions du système
+          d'équations sont : <strong> x = 2, y = 3, z = -1</strong>.
         </p>
 
-        <h3>Applications of Gauss-Jordan Elimination</h3>
+        <h3>Applications de l'élimination de Gauss-Jordan</h3>
         <ul>
           <li>
-            <strong>Solving Systems of Linear Equations:</strong> Gauss-Jordan
-            elimination is widely used to find the solution to systems of linear
-            equations.
+            <strong>Résolution de systèmes d'équations linéaires :</strong> 
+            L'élimination de Gauss-Jordan est largement utilisée pour trouver 
+            la solution des systèmes d'équations linéaires.
           </li>
           <li>
-            <strong>Finding the Determinant:</strong> The Gaussian elimination
-            method can be used to compute the determinant of a square matrix.
+            <strong>Calcul du déterminant :</strong> La méthode de Gauss peut 
+            être utilisée pour calculer le déterminant d'une matrice carrée.
           </li>
           <li>
-            <strong>Finding the Inverse of a Matrix:</strong> Gauss-Jordan
-            elimination can be used to determine the inverse of a square matrix
-            by augmenting the matrix with the identity matrix and reducing it.
+            <strong>Recherche de l'inverse d'une matrice :</strong> 
+            L'élimination de Gauss-Jordan peut être utilisée pour déterminer 
+            l'inverse d'une matrice carrée en augmentant la matrice avec la 
+            matrice identité et en la réduisant.
           </li>
           <li>
-            <strong>Computing Rank and Bases:</strong> The method is useful for
-            determining the rank and bases of a matrix by reducing it to its row
-            echelon form or RREF.
+            <strong>Calcul du rang et des bases :</strong> La méthode est utile 
+            pour déterminer le rang et les bases d'une matrice en la réduisant 
+            à sa forme échelonnée ou RREF.
           </li>
         </ul>
 
-        <h3>C++ Code for Gauss-Jordan Elimination</h3>
+        <h3>Code C++ pour l'élimination de Gauss-Jordan</h3>
         <p>
-          Here is the C++ code to implement the Gauss-Jordan elimination method:
+          Voici le code C++ pour implémenter la méthode d'élimination de
+          Gauss-Jordan :
         </p>
         <pre>
           <div style={{ padding: "20px", backgroundColor: "#f8fcff" }}>
@@ -172,9 +174,10 @@ void gaussJordan(vector<vector<int>>& a, int n) {
         </pre>
 
         <p>
-          This C++ code solves a system of linear equations using the
-          Gauss-Jordan elimination method by performing elementary row
-          operations to reduce the matrix to its reduced row echelon form.
+          Ce code C++ résout un système d'équations linéaires en utilisant la
+          méthode d'élimination de Gauss-Jordan en effectuant des opérations
+          élémentaires sur les lignes pour réduire la matrice à sa forme
+          échelonnée réduite.
         </p>
       </div>
     </MathJaxContext>
