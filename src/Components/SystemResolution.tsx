@@ -85,11 +85,30 @@ const SystemResolution: React.FC = () => {
       const result = gaussJordanWithPivot(matrix);
       setSolutionMatrix(result.matrix);
       setSteps(result.steps);
-      setShowSteps(!(fileImported && matrixSize > 5)); // Affiche uniquement la solution si la matrice est grande
+      setShowSteps(!(fileImported || matrixSize > 10)); 
     } catch (error) {
       setError("Erreur lors de la résolution.");
     }
   };
+  const handleRandomMatrix = () => {
+    const newMatrix = Array(matrixSize)
+      .fill(0)
+      .map(() => Array(matrixSize + 1).fill(0).map(() => Math.floor(Math.random() * 20) - 10)); // Random values between -10 and 10
+    setMatrix(newMatrix);
+    setSolutionMatrix(null);
+    setSteps([]);
+    setFileImported(false);
+  
+    try {
+      const result = gaussJordanWithPivot(newMatrix);
+      setSolutionMatrix(result.matrix);
+      setSteps(result.steps);
+      setShowSteps(matrixSize <= 10);
+    } catch (error) {
+      setError("Erreur lors de la résolution.");
+    }
+  };
+  
   
   const renderMatrix = () => {
     const matrixString = matrix
@@ -115,11 +134,19 @@ const SystemResolution: React.FC = () => {
       reader.onload = (event) => {
         const content = event.target?.result as string;
         const values = lireFichier(content);
-        if (values.length < matrixSize * (matrixSize + 1)) {
-          setError("Le fichier contient trop peu de valeurs pour former la matrice.");
-          return;
-        }
-        setMatrix(selectionAleatoire(values, matrixSize));
+        const n = Math.floor(Math.sqrt(values.length)); // Essaye de trouver la dimension n
+      if (n * (n + 1) !== values.length) {
+        setError("Le fichier n'est pas de la forme n*(n+1) ou contient trop peu de valeurs.");
+        return;
+      }
+
+      // Forme la matrice avec les valeurs filtrées
+      const matrix = [];
+      for (let i = 0; i < n; i++) {
+        matrix.push(values.slice(i * (n + 1), (i + 1) * (n + 1)));
+      }
+        setMatrixSize(n);
+        setMatrix(matrix);
         setSolutionMatrix(null);
         setSteps([]);
         setFileImported(true);
@@ -128,26 +155,15 @@ const SystemResolution: React.FC = () => {
       reader.readAsText(file);
     }
   };
-  
-  const selectionAleatoire = (values: number[], n: number): number[][] => {
-    const matrix: number[][] = [];
-    for (let i = 0; i < n; i++) {
-      const row = [];
-      for (let j = 0; j < n + 1; j++) {
-        const randomIndex = Math.floor(Math.random() * values.length);
-        row.push(values[randomIndex]);
-      }
-      matrix.push(row);
-    }
-    return matrix;
-  };
 
   const lireFichier = (fileContent: string): number[] => {
+    // Filtre les nombres en ignorant les autres chaînes de texte
     return fileContent
       .split(/\s+/)
       .map((val) => parseFloat(val))
       .filter((num) => !isNaN(num));
   };
+  
   
 
   return (
@@ -275,6 +291,9 @@ const SystemResolution: React.FC = () => {
           onChange={handleImport}
           className="btn btn-secondary ms-2"
         />
+        <button className="btn btn-warning ms-2" onClick={handleRandomMatrix}>
+          Random Matrix
+        </button>
       </div>
 
       {solutionMatrix && (
