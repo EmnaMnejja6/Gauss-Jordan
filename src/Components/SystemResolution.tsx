@@ -82,14 +82,16 @@ const SystemResolution: React.FC = () => {
   };*/
   const handleResolution = () => {
     try {
-      const result = gaussJordanWithPivot(matrix);
+      const matrixCopy = matrix.map(row => [...row]); // Crée une copie indépendante de la matrice
+      const result = gaussJordanWithPivot(matrixCopy);
       setSolutionMatrix(result.matrix);
       setSteps(result.steps);
-      setShowSteps(!(fileImported || matrixSize > 10)); 
+      setShowSteps(!(fileImported && matrixSize > 10)); // Affiche ou masque les étapes
     } catch (error) {
       setError("Erreur lors de la résolution.");
     }
   };
+  
   const handleRandomMatrix = () => {
     const newMatrix = Array(matrixSize)
       .fill(0)
