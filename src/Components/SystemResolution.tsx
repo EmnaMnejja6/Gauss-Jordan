@@ -86,7 +86,7 @@ const SystemResolution: React.FC = () => {
       const result = gaussJordanWithPivot(matrixCopy);
       setSolutionMatrix(result.matrix);
       setSteps(result.steps);
-      setShowSteps(!(fileImported && matrixSize > 10)); // Affiche ou masque les étapes
+      setShowSteps(!(fileImported && matrixSize > 10)); 
     } catch (error) {
       setError("Erreur lors de la résolution.");
     }
@@ -102,7 +102,8 @@ const SystemResolution: React.FC = () => {
     setFileImported(false);
   
     try {
-      const result = gaussJordanWithPivot(newMatrix);
+      const matrixCopy1 = newMatrix.map(row => [...row]);
+      const result = gaussJordanWithPivot(matrixCopy1);
       setSolutionMatrix(result.matrix);
       setSteps(result.steps);
       setShowSteps(matrixSize <= 10);
