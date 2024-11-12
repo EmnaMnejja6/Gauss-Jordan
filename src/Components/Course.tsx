@@ -64,7 +64,9 @@ const Cours = () => {
         <ol>
           <li>Échanger deux lignes</li>
           <li>Multiplier une ligne par un scalaire non nul</li>
-          <li>Ajouter ou soustraire des multiples d'une ligne à une autre ligne</li>
+          <li>
+            Ajouter ou soustraire des multiples d'une ligne à une autre ligne
+          </li>
         </ol>
 
         <h3>Exemple</h3>
@@ -100,24 +102,24 @@ const Cours = () => {
         <h3>Applications de l'élimination de Gauss-Jordan</h3>
         <ul>
           <li>
-            <strong>Résolution de systèmes d'équations linéaires :</strong> 
-            L'élimination de Gauss-Jordan est largement utilisée pour trouver 
-            la solution des systèmes d'équations linéaires.
+            <strong>Résolution de systèmes d'équations linéaires :</strong>
+            L'élimination de Gauss-Jordan est largement utilisée pour trouver la
+            solution des systèmes d'équations linéaires.
           </li>
           <li>
-            <strong>Calcul du déterminant :</strong> La méthode de Gauss peut 
+            <strong>Calcul du déterminant :</strong> La méthode de Gauss peut
             être utilisée pour calculer le déterminant d'une matrice carrée.
           </li>
           <li>
-            <strong>Recherche de l'inverse d'une matrice :</strong> 
-            L'élimination de Gauss-Jordan peut être utilisée pour déterminer 
-            l'inverse d'une matrice carrée en augmentant la matrice avec la 
+            <strong>Recherche de l'inverse d'une matrice :</strong>
+            L'élimination de Gauss-Jordan peut être utilisée pour déterminer
+            l'inverse d'une matrice carrée en augmentant la matrice avec la
             matrice identité et en la réduisant.
           </li>
           <li>
-            <strong>Calcul du rang et des bases :</strong> La méthode est utile 
-            pour déterminer le rang et les bases d'une matrice en la réduisant 
-            à sa forme échelonnée ou RREF.
+            <strong>Calcul du rang et des bases :</strong> La méthode est utile
+            pour déterminer le rang et les bases d'une matrice en la réduisant à
+            sa forme échelonnée ou RREF.
           </li>
         </ul>
 

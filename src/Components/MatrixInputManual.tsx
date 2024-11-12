@@ -4,12 +4,11 @@ import {
   gaussJordanWithPivot,
   gaussJordanWithoutPivot,
   resolveDiagonal,
-  resolveSymmetric,
   resolveBand,
   resolveSymmetricPositiveDefinite,
 } from "../utils/matrixCalculations";
 
-const SystemResolution: React.FC = () => {
+const MatrixInputManual: React.FC = () => {
   const [matrixSize, setMatrixSize] = useState<number>(2);
   const [matrix, setMatrix] = useState<number[][]>(
     Array(2).fill(Array(3).fill(0))
@@ -86,32 +85,6 @@ const SystemResolution: React.FC = () => {
     }
   };
 
-  const handleRandomMatrix = () => {
-    const newMatrix = Array(matrixSize)
-      .fill(0)
-      .map(() =>
-        Array(matrixSize + 1)
-          .fill(0)
-          .map(() => Math.floor(Math.random() * 20) - 10)
-      ); // Random values between -10 and 10
-
-    setMatrix(newMatrix);
-    setSolutionMatrix(null);
-    setSteps([]);
-    setFileImported(false);
-    setMatrixType("Dense");
-
-    try {
-      const matrixCopy1 = newMatrix.map((row) => [...row]);
-      const result = gaussJordanWithPivot(matrixCopy1);
-      setSolutionMatrix(result.matrix);
-      setSteps(result.steps);
-      setShowSteps(matrixSize <= 10);
-    } catch (error) {
-      setError("Erreur lors de la résolution.");
-    }
-  };
-
   const renderMatrix = () => {
     const matrixString = matrix
       .map((row) => row.map((value) => value.toString()).join("&"))
@@ -128,53 +101,13 @@ const SystemResolution: React.FC = () => {
     return `\\left(\\begin{matrix}${matrixString}\\end{matrix}\\right)`;
   };
 
-  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const content = event.target?.result as string;
-        const values = lireFichier(content);
-        const n = Math.floor(Math.sqrt(values.length)); // Essaye de trouver la dimension n
-        if (n * (n + 1) !== values.length) {
-          setError(
-            "Le fichier n'est pas de la forme n*(n+1) ou contient trop peu de valeurs."
-          );
-          return;
-        }
-
-        // Forme la matrice avec les valeurs filtrées
-        const matrix = [];
-        for (let i = 0; i < n; i++) {
-          matrix.push(values.slice(i * (n + 1), (i + 1) * (n + 1)));
-        }
-        setMatrixSize(n);
-        setMatrix(matrix);
-        setSolutionMatrix(null);
-        setSteps([]);
-        setFileImported(true);
-        setError(null);
-      };
-      reader.readAsText(file);
-    }
-  };
-
-  const lireFichier = (fileContent: string): number[] => {
-    // Filtre les nombres en ignorant les autres chaînes de texte
-    return fileContent
-      .split(/\s+/)
-      .map((val) => parseFloat(val))
-      .filter((num) => !isNaN(num));
-  };
-
   return (
     <div
       className="container"
       style={{
         width: "600px",
         fontSize: "24px",
-        marginTop: "65px",
-        marginLeft: "500px",
+        marginTop: "10px",
         marginRight: "auto",
         textAlign: "justify",
       }}
@@ -287,15 +220,6 @@ const SystemResolution: React.FC = () => {
         <button className="btn btn-danger ms-2" onClick={handleClearMatrix}>
           Effacer
         </button>
-        <input
-          type="file"
-          accept=".txt"
-          onChange={handleImport}
-          className="btn btn-secondary ms-2"
-        />
-        <button className="btn btn-warning ms-2" onClick={handleRandomMatrix}>
-          Matrice aléatoire
-        </button>
       </div>
 
       {solutionMatrix && (
@@ -330,4 +254,4 @@ const SystemResolution: React.FC = () => {
   );
 };
 
-export default SystemResolution;
+export default MatrixInputManual;
