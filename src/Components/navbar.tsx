@@ -13,17 +13,22 @@ const Navbar: React.FC = () => {
             onClick={() => navigate("/")}
             style={{ cursor: "pointer" }}
           >
-            Home
+            Acceuil
           </a>
         </li>
         <li className="nav-item">
+          <NavLink to="/about" className="nav-link">
+            A propos
+          </NavLink>
+        </li>
+        <li className="nav-item">
           <NavLink to="/courses" className="nav-link">
-            Course
+            Cours
           </NavLink>
         </li>
         <li className="nav-item">
           <NavLink to="/resolution" className="nav-link">
-            Resolution
+            Résolution
           </NavLink>
         </li>
         <li className="nav-item">

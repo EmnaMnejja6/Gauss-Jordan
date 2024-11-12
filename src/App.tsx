@@ -10,9 +10,9 @@ import Navbar from "./Components/navbar";
 import GaussJordan from "./Components/Home";
 import Cours from "./Components/Course";
 import InverseCalculation from "./Components/InverseCalculation";
-import MatrixInput from "./Components/SystemResolution";
-import SystemResolution from "./Components/SystemResolution";
 import Resolution from "./Components/Resolution";
+import About from "./Components/about";
+("./Components/About");
 const App: React.FC = () => {
   const location = useLocation();
   const showNavbar = location.pathname !== "/";
@@ -29,6 +29,7 @@ const App: React.FC = () => {
       {showNavbar && <Navbar />}
       <Routes>
         <Route path="/" element={<GaussJordan />} />
+        <Route path="/about" element={<About />} />
         <Route path="/courses" element={<Cours />} />
         <Route path="/resolution" element={<Resolution />} />
         <Route path="/inverse" element={<InverseCalculation />} />
