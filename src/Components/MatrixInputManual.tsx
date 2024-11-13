@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { MathJax, MathJaxContext } from "better-react-mathjax";
 import {
   gaussJordanWithPivot,
-  gaussJordanWithoutPivot,
   resolveDiagonal,
   resolveBand,
   resolveSymmetricPositiveDefinite,
@@ -17,8 +16,36 @@ const MatrixInputManual: React.FC = () => {
   const [steps, setSteps] = useState<string[]>([]);
   const [showSteps, setShowSteps] = useState<boolean>(true);
   const [matrixType, setMatrixType] = useState<string | null>(null);
+  const [bandWidth, setBandWidth] = useState<number>(0); // New state for band width
   const [error, setError] = useState<string | null>(null);
-  const [fileImported, setFileImported] = useState<boolean>(false);
+
+  const handleResolution = () => {
+    try {
+      const matrixCopy = matrix.map((row) => [...row]);
+      let result;
+
+      switch (matrixType) {
+        case "Diagonal":
+          result = resolveDiagonal(matrixCopy);
+          break;
+        case "Symmetric Positive Definite":
+          result = resolveSymmetricPositiveDefinite(matrixCopy);
+          break;
+        case "Band":
+          result = resolveBand(matrixCopy, bandWidth); // Pass band width to function
+          break;
+        case "Dense":
+        default:
+          result = gaussJordanWithPivot(matrixCopy);
+          break;
+      }
+
+      setSolutionMatrix(result.matrix);
+      setSteps(result.steps);
+    } catch (error) {
+      setError("Erreur lors de la résolution.");
+    }
+  };
 
   const handleMatrixSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const size = parseInt(e.target.value, 10);
@@ -52,37 +79,8 @@ const MatrixInputManual: React.FC = () => {
     setSolutionMatrix(null);
     setSteps([]);
     setMatrixType(null);
+    setBandWidth(0); // Reset band width
     setError(null);
-    //
-    setFileImported(false);
-  };
-  const handleResolution = () => {
-    try {
-      const matrixCopy = matrix.map((row) => [...row]);
-      let result;
-
-      switch (matrixType) {
-        case "Diagonal":
-          result = resolveDiagonal(matrixCopy);
-          break;
-        case "Symmetric Positive Definite":
-          result = resolveSymmetricPositiveDefinite(matrixCopy);
-          break;
-        case "Band":
-          result = resolveBand(matrixCopy);
-          break;
-        case "Dense":
-        default:
-          result = gaussJordanWithPivot(matrixCopy);
-          break;
-      }
-
-      setSolutionMatrix(result.matrix);
-      setSteps(result.steps);
-      setShowSteps(!(fileImported && matrixSize > 10));
-    } catch (error) {
-      setError("Erreur lors de la résolution.");
-    }
   };
 
   const renderMatrix = () => {
@@ -158,9 +156,9 @@ const MatrixInputManual: React.FC = () => {
             type="radio"
             className="form-check-input"
             name="matrixType"
-            id="band"
-            value="Band"
-            onChange={() => setMatrixType("")}
+            id="dense"
+            value="Dense"
+            onChange={() => setMatrixType("Dense")}
           />
           <label className="form-check-label" htmlFor="dense">
             Dense
@@ -209,6 +207,22 @@ const MatrixInputManual: React.FC = () => {
             Bande
           </label>
         </div>
+
+        {/* Band width input field */}
+        {matrixType === "Band" && (
+          <div className="mt-3">
+            <label>Largeur de la bande: </label>
+            <input
+              type="number"
+              value={bandWidth}
+              onChange={(e) => setBandWidth(parseInt(e.target.value, 10))}
+              className="form-control"
+              style={{ width: "100px", margin: "0 auto" }}
+              min={1}
+              max={matrixSize - 1}
+            />
+          </div>
+        )}
       </div>
 
       {error && <div className="alert alert-danger">{error}</div>}

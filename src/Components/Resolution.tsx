@@ -13,50 +13,6 @@ import MatrixInputManual from "./MatrixInputManual";
 
 const Resolution: React.FC = () => {
   const [inputType, setInputType] = useState<String | null>(null);
-  const handleResolution = () => {
-    try {
-      const matrixCopy = matrix.map((row) => [...row]);
-      let result;
-
-      switch (matrixType) {
-        case "Diagonal":
-          result = resolveDiagonal(matrixCopy);
-          break;
-        case "Symmetric Positive Definite":
-          result = resolveSymmetricPositiveDefinite(matrixCopy);
-          break;
-        case "Band":
-          result = resolveBand(matrixCopy);
-          break;
-        case "Dense":
-        default:
-          result = gaussJordanWithPivot(matrixCopy);
-          break;
-      }
-
-      setSolutionMatrix(result.matrix);
-      setSteps(result.steps);
-      setShowSteps(!(fileImported && matrixSize > 10));
-    } catch (error) {
-      setError("Erreur lors de la résolution.");
-    }
-  };
-
-  const renderMatrix = () => {
-    const matrixString = matrix
-      .map((row) => row.map((value) => value.toString()).join("&"))
-      .join("\\\\");
-    return `\\left(\\begin{matrix}${matrixString}\\end{matrix}\\right)`;
-  };
-
-  const renderSolutionMatrix = () => {
-    if (!solutionMatrix) return null;
-    const solutionColumn = solutionMatrix.map((row) => row[row.length - 1]);
-    const matrixString = solutionColumn
-      .map((value) => value.toString())
-      .join("\\\\");
-    return `\\left(\\begin{matrix}${matrixString}\\end{matrix}\\right)`;
-  };
 
   return (
     <div
