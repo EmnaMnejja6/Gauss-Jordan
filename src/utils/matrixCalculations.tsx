@@ -28,6 +28,7 @@ function isBand(mat: number[][], k: { value: number }): boolean {
   k.value = k1;
   return true;
 }
+/*
 export function gaussJordanBanded(
   matrix: number[][],
   k: number
@@ -91,6 +92,68 @@ export function gaussJordanBanded(
     }
   }
 
+  return { matrix, steps };
+}
+*/
+export function gaussJordanBanded(
+  matrix: number[][],
+  k: number
+): {
+  matrix: number[][],
+  steps: string[]
+} {
+  const steps: string[] = [];
+  const n = matrix.length;
+  let operationsCount = 0;
+
+  for (let pivot = 0; pivot < n; pivot++) {
+    let maxVal = Math.abs(matrix[pivot][pivot]);
+    let iPivot = pivot;
+
+    // Recherche du pivot maximal dans la bande
+    for (let i = pivot + 1; i <= pivot + k && i < n; i++) {
+      if (Math.abs(matrix[i][pivot]) > maxVal) {
+        maxVal = Math.abs(matrix[i][pivot]);
+        iPivot = i;
+      }
+    }
+
+    // Échange de lignes si nécessaire
+    if (iPivot !== pivot) {
+      for (let j = 0; j < n + 1; j++) {
+        const aux = matrix[pivot][j];
+        matrix[pivot][j] = matrix[iPivot][j];
+        matrix[iPivot][j] = aux;
+      }
+      steps.push(`\\text{Échange des lignes ${pivot + 1} et ${iPivot + 1}}`);
+    }
+
+    // Normalisation de la ligne de pivot
+    for (let j = pivot + 1; j < n + 1; j++) {
+      matrix[pivot][j] /= matrix[pivot][pivot];
+      operationsCount += 1;
+    }
+
+    // Élimination des autres lignes en haut de la bande
+    for (let i = pivot - k; i < pivot && i >= 0; i++) {
+      for (let j = pivot + 1; j < n + 1; j++) {
+        matrix[i][j] -= matrix[i][pivot] * matrix[pivot][j];
+        operationsCount += 2;
+      }
+    }
+
+    // Élimination des autres lignes en bas de la bande
+    for (let i = pivot + 1; i <= pivot + k && i < n; i++) {
+      for (let j = pivot + 1; j < n + 1; j++) {
+        matrix[i][j] -= matrix[i][pivot] * matrix[pivot][j];
+        operationsCount += 2;
+      }
+    }
+
+    steps.push(`\\left(\\begin{matrix} ${formatAugmentedMatrix(matrix)} \\end{matrix}\\right)`);
+  }
+
+  steps.push(`\\text{Nombre total d'opérations arithmétiques : ${operationsCount}}`);
   return { matrix, steps };
 }
 
