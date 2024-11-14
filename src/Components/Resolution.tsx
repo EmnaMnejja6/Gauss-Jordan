@@ -1,34 +1,27 @@
 import React, { useState } from "react";
-import { MathJax, MathJaxContext } from "better-react-mathjax";
-import {
-  gaussJordanWithPivot,
-  gaussJordanWithoutPivot,
-  resolveDiagonal,
-  resolveBand,
-  resolveSymmetricPositiveDefinite,
-} from "../utils/matrixCalculations";
 import MatrixInputFile from "./MatrixInputFile";
 import MatrixInputRandom from "./MatrixInputRandom";
 import MatrixInputManual from "./MatrixInputManual";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 const Resolution: React.FC = () => {
   const [inputType, setInputType] = useState<String | null>(null);
 
   return (
     <div
-      className="container"
+      className="container card shadow p-4 mb-5 bg-white rounded "
       style={{
-        width: "600px",
-        fontSize: "24px",
+        maxWidth: "800px",
+        marginLeft: "480px",
         marginTop: "80px",
-        marginLeft: "500px",
-        marginRight: "auto",
-        textAlign: "justify",
+        fontSize: "18px",
       }}
     >
-      <h2>Choisir le type de saisie</h2>
-      {inputType === "manual"}
-      <div className="form-check">
+      <h2 className="text-center mb-4">Choisir le type de saisie</h2>
+      <p className="text-muted text-center mb-4">
+        Veuillez sélectionner le mode de saisie de la matrice.
+      </p>
+      <div className="form-check mb-3">
         <input
           type="radio"
           className="form-check-input"
@@ -37,9 +30,9 @@ const Resolution: React.FC = () => {
           onChange={() => setInputType("manual")}
           checked={inputType === "manual"}
         />
-        <label className="form-check-label">Saisie Manuelle</label>
+        <label className="form-check-label ms-2">Saisie Manuelle</label>
       </div>
-      <div className="form-check">
+      <div className="form-check mb-3">
         <input
           type="radio"
           className="form-check-input"
@@ -48,9 +41,9 @@ const Resolution: React.FC = () => {
           onChange={() => setInputType("random")}
           checked={inputType === "random"}
         />
-        <label className="form-check-label">Aléatoire</label>
+        <label className="form-check-label ms-2">Aléatoire</label>
       </div>
-      <div className="form-check">
+      <div className="form-check mb-4">
         <input
           type="radio"
           className="form-check-input"
@@ -59,7 +52,7 @@ const Resolution: React.FC = () => {
           onChange={() => setInputType("file")}
           checked={inputType === "file"}
         />
-        <label className="form-check-label">
+        <label className="form-check-label ms-2">
           Importer à partir d'un fichier
         </label>
       </div>

@@ -6,6 +6,7 @@ import {
   useLocation,
   useNavigate,
 } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
 import Navbar from "./Components/navbar";
 import GaussJordan from "./Components/Home";
 import Cours from "./Components/Course";

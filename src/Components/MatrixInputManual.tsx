@@ -32,7 +32,7 @@ const MatrixInputManual: React.FC = () => {
           result = resolveSymmetricPositiveDefinite(matrixCopy);
           break;
         case "Band":
-          result = resolveBand(matrixCopy, bandWidth); // Pass band width to function
+          result = resolveBand(matrixCopy, bandWidth);
           break;
         case "Dense":
         default:

@@ -161,6 +161,112 @@ export function isInvertible(mat: number[][]): boolean {
   }
   return true;
 }
+export function inverseMatrix(mat: number[][]): {
+  matrix: number[][]; // La matrice finale après réduction
+  steps: string[]; // Les étapes pendant le calcul
+} {
+  const steps: string[] = [];
+  const n = mat.length;
+
+  // Créer une copie profonde de la matrice pour l'opération
+  const augmentedMatrix = mat.map((row) => [...row, ...Array(n).fill(0)]);
+  for (let i = 0; i < n; i++) {
+    augmentedMatrix[i][i + n] = 1;
+  }
+
+  // Afficher la matrice augmentée initiale
+  steps.push("Matrice augmentée initiale :");
+  steps.push(formatAugmentedMatrix(augmentedMatrix));
+
+  let factor: number, diag: number;
+  let permute: boolean;
+
+  // Gauss-Jordan Elimination
+  for (let k = 0; k < n; k++) {
+    diag = augmentedMatrix[k][k];
+    if (diag === 0) {
+      permute = false;
+      for (let i = k + 1; i < n; i++) {
+        if (augmentedMatrix[i][k] !== 0) {
+          [augmentedMatrix[k], augmentedMatrix[i]] = [
+            augmentedMatrix[i],
+            augmentedMatrix[k],
+          ];
+          permute = true;
+          steps.push(`Permutation des lignes ${k + 1} et ${i + 1}`);
+          steps.push(formatAugmentedMatrix(augmentedMatrix));
+          break;
+        }
+      }
+      if (!permute) {
+        steps.push("La matrice est singulière et ne peut pas être inversée.");
+        alert("La matrice est singulière et ne peut pas");
+        throw new Error(
+          "La matrice est singulière et ne peut pas etre inversée."
+        );
+      }
+      diag = augmentedMatrix[k][k]; // Mettre à jour la diagonale après permutation
+    }
+
+    // Normalisation de la ligne
+    for (let j = 0; j < 2 * n; j++) {
+      augmentedMatrix[k][j] /= diag;
+    }
+    steps.push(`Normalisation de la ligne ${k + 1}`);
+    steps.push(formatAugmentedMatrix(augmentedMatrix));
+
+    // Élimination des éléments au-dessus de la diagonale
+    for (let i = 0; i < k; i++) {
+      const factor = augmentedMatrix[i][k];
+      for (let j = 0; j < 2 * n; j++) {
+        augmentedMatrix[i][j] -= factor * augmentedMatrix[k][j];
+      }
+      steps.push(
+        `Opération de ligne ${i + 1} : r_${i + 1} - (${factor}) * r_${k + 1}`
+      );
+      steps.push(formatAugmentedMatrix(augmentedMatrix));
+    }
+
+    // Élimination des éléments en-dessous de la diagonale
+    for (let i = k + 1; i < n; i++) {
+      const factor = augmentedMatrix[i][k];
+      for (let j = 0; j < 2 * n; j++) {
+        augmentedMatrix[i][j] -= factor * augmentedMatrix[k][j];
+      }
+      steps.push(
+        `Opération de ligne ${i + 1} : r_${i + 1} - (${factor}) * r_${k + 1}`
+      );
+      steps.push(formatAugmentedMatrix(augmentedMatrix));
+    }
+    steps.push(`Matrice augmentée après l'itération ${k + 1}:`);
+    steps.push(formatAugmentedMatrix(augmentedMatrix));
+    steps.push("");
+  }
+
+  // Séparer la matrice inverse de la matrice augmentée
+  const inverseMatrix = augmentedMatrix.map((row) => row.slice(n));
+
+  return { matrix: inverseMatrix, steps };
+}
+
+function formatAugmentedMatrix(matrix: number[][]): string {
+  const n = matrix.length;
+  const formattedMatrix = matrix
+    .map((row) => {
+      const leftSide = row
+        .slice(0, n)
+        .map((cell) => cell.toFixed(2))
+        .join(" & ");
+      const rightSide = row
+        .slice(n)
+        .map((cell) => cell.toFixed(2))
+        .join(" & ");
+      return `${leftSide} & \\vert & ${rightSide}`; // Ajoute une ligne verticale entre les deux parties
+    })
+    .join(" \\\\ ");
+
+  return `\\begin{pmatrix} ${formattedMatrix} \\end{pmatrix}`;
+}
 export function isDiagonallyDominant(matrix: number[][]): boolean {
   const n = matrix.length;
 
@@ -182,45 +288,6 @@ export function isDiagonallyDominant(matrix: number[][]): boolean {
   }
 
   return true; // The matrix is diagonally dominant
-}
-
-export function invertMatrix(mat: number[][]): number[][] | null {
-  const n = mat.length;
-  let augmentedMatrix = augmentMatrix(mat);
-
-  // Check if the matrix is invertible
-  if (!isInvertible(augmentedMatrix)) {
-    return null;
-  }
-
-  for (let k = 0; k < n; k++) {
-    let diag = augmentedMatrix[k][k];
-
-    // Normalize the pivot row
-    for (let j = 0; j < 2 * n; j++) {
-      augmentedMatrix[k][j] /= diag;
-    }
-
-    // Eliminate other rows above the pivot
-    for (let i = 0; i < k; i++) {
-      const factor = augmentedMatrix[i][k];
-      for (let j = 0; j < 2 * n; j++) {
-        augmentedMatrix[i][j] -= factor * augmentedMatrix[k][j];
-      }
-    }
-
-    // Eliminate other rows below the pivot
-    for (let i = k + 1; i < n; i++) {
-      const factor = augmentedMatrix[i][k];
-      for (let j = 0; j < 2 * n; j++) {
-        augmentedMatrix[i][j] -= factor * augmentedMatrix[k][j];
-      }
-    }
-  }
-
-  // Extract the inverse matrix from the augmented matrix
-  const inverseMatrix = augmentedMatrix.map((row) => row.slice(n));
-  return inverseMatrix;
 }
 
 export function gaussJordanWithoutPivot(matrix: number[][]): {
@@ -291,21 +358,6 @@ export function gaussJordanWithoutPivot(matrix: number[][]): {
   }
 
   return { matrix, steps };
-}
-
-// Helper function to format the augmented matrix for LaTeX display
-function formatAugmentedMatrix(matrix: number[][]): string {
-  return matrix
-    .map(
-      (row) =>
-        row
-          .slice(0, -1) // Get all elements except the last one
-          .map((value) => toFraction(value))
-          .join(" & ") +
-        " & | & " +
-        toFraction(row[row.length - 1]) // Add the last element with a separator
-    )
-    .join(" \\\\ ");
 }
 
 // Helper function to find the greatest common divisor
@@ -441,43 +493,6 @@ export function formatMatrix(matrix: number[][]): string {
     .join(" \\\\ ")} \\end{bmatrix}`;
 }
 
-export function inverseMatrix(matrix: number[][]): number[][] | null {
-  const n = matrix.length;
-  const inv = Array.from({ length: n }, (_, i) =>
-    Array.from({ length: n }, (_, j) => (i === j ? 1 : 0))
-  );
-
-  // Make a deep copy of the matrix to avoid mutating the original
-  const mat = matrix.map((row) => [...row]);
-
-  for (let i = 0; i < n; i++) {
-    let diag = mat[i][i];
-    if (diag === 0) {
-      // If we encounter a zero diagonal element, the matrix is singular and has no inverse
-      return null;
-    }
-
-    // Normalize the row by dividing by the diagonal element
-    for (let j = 0; j < n; j++) {
-      mat[i][j] /= diag;
-      inv[i][j] /= diag;
-    }
-
-    // Make other rows zero in the current column
-    for (let k = 0; k < n; k++) {
-      if (k !== i) {
-        const factor = mat[k][i];
-        for (let j = 0; j < n; j++) {
-          mat[k][j] -= factor * mat[i][j];
-          inv[k][j] -= factor * inv[i][j];
-        }
-      }
-    }
-  }
-
-  return inv; // Return the inverse matrix
-}
-
 export function resolveDiagonal(matrix: number[][]): {
   matrix: number[][]; // The final reduced matrix
   steps: string[]; // The steps during the calculation
@@ -485,6 +500,7 @@ export function resolveDiagonal(matrix: number[][]): {
   const isDominant = isDiagonallyDominant(matrix);
 
   if (!isDiagonallyDominant(matrix)) {
+    alert("The matrix is not diagonally dominant");
     throw new Error("The matrix is not diagonally dominant.");
   }
 
