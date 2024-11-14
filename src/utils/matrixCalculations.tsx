@@ -99,13 +99,8 @@ export function gaussJordanBanded(
   matrix: number[][],
   k: number
 ): {
-<<<<<<< HEAD
   matrix: number[][];
   steps: string[];
-=======
-  matrix: number[][],
-  steps: string[]
->>>>>>> 57513abf8dc2090188ec96c4f137f8967b91582c
 } {
   const steps: string[] = [];
   const n = matrix.length;
@@ -155,7 +150,6 @@ export function gaussJordanBanded(
       }
     }
 
-<<<<<<< HEAD
     steps.push(
       `\\left(\\begin{matrix} ${formatAugmentedMatrix(
         matrix
@@ -166,12 +160,10 @@ export function gaussJordanBanded(
   steps.push(
     `\\text{Nombre total d'opérations arithmétiques : ${operationsCount}}`
   );
-=======
     steps.push(`\\left(\\begin{matrix} ${formatAugmentedMatrix(matrix)} \\end{matrix}\\right)`);
-  }
+  
 
   steps.push(`\\text{Nombre total d'opérations arithmétiques : ${operationsCount}}`);
->>>>>>> 57513abf8dc2090188ec96c4f137f8967b91582c
   return { matrix, steps };
 }
 
@@ -376,18 +368,16 @@ export function gaussJordanWithoutPivot(matrix: number[][]): {
 
 // Helper function to format the augmented matrix for LaTeX display
 function formatAugmentedMatrix(matrix: number[][]): string {
-  return matrix
-    .map(
-      (row) =>
-        row
-          .slice(0, -1) // Get all elements except the last one
-          .map((value) => toFraction(value))
-          .join(" & ") +
-        " & | & " +
-        toFraction(row[row.length - 1]) // Add the last element with a separator
-    )
+  const n = matrix.length;
+  const formattedMatrix = matrix
+    .map(row => {
+      const leftSide = row.slice(0, n).map(cell => parseFloat(cell.toFixed(2)).toString()).join(" & ");
+      const rightSide = row.slice(n).map(cell => parseFloat(cell.toFixed(2)).toString()).join(" & ");
+      return `${leftSide} & \\vert & ${rightSide}`;// Adds a vertical line between the two parts
+    })
     .join(" \\\\ ");
-}
+  
+    return `\\begin{pmatrix} ${formattedMatrix} \\end{pmatrix}`;}
 
 // Helper function to find the greatest common divisor
 function greatestCommonDivisor(a: number, b: number): number {
@@ -522,42 +512,94 @@ export function formatMatrix(matrix: number[][]): string {
     .join(" \\\\ ")} \\end{bmatrix}`;
 }
 
-export function inverseMatrix(matrix: number[][]): number[][] | null {
-  const n = matrix.length;
-  const inv = Array.from({ length: n }, (_, i) =>
-    Array.from({ length: n }, (_, j) => (i === j ? 1 : 0))
-  );
+export function inverseMatrix(mat: number[][]): {
+  matrix: number[][]; // La matrice finale après réduction
+  steps: string[]; // Les étapes pendant le calcul
+} {
+  const steps: string[] = [];
+  const n = mat.length;
 
-  // Make a deep copy of the matrix to avoid mutating the original
-  const mat = matrix.map((row) => [...row]);
-
+  // Créer une copie profonde de la matrice pour l'opération
+  const augmentedMatrix = mat.map((row) => [...row, ...Array(n).fill(0)]);
   for (let i = 0; i < n; i++) {
-    let diag = mat[i][i];
-    if (diag === 0) {
-      // If we encounter a zero diagonal element, the matrix is singular and has no inverse
-      return null;
-    }
-
-    // Normalize the row by dividing by the diagonal element
-    for (let j = 0; j < n; j++) {
-      mat[i][j] /= diag;
-      inv[i][j] /= diag;
-    }
-
-    // Make other rows zero in the current column
-    for (let k = 0; k < n; k++) {
-      if (k !== i) {
-        const factor = mat[k][i];
-        for (let j = 0; j < n; j++) {
-          mat[k][j] -= factor * mat[i][j];
-          inv[k][j] -= factor * inv[i][j];
-        }
-      }
-    }
+    augmentedMatrix[i][i + n] = 1;
   }
 
-  return inv; // Return the inverse matrix
+  // Afficher la matrice augmentée initiale
+  steps.push("Matrice augmentée initiale :");
+  steps.push(formatAugmentedMatrix(augmentedMatrix));
+
+  let diag: number;
+  let permute: boolean;
+
+  // Gauss-Jordan Elimination
+  for (let k = 0; k < n; k++) {
+    diag = augmentedMatrix[k][k];
+    if (diag === 0) {
+      permute = false;
+      for (let i = k + 1; i < n; i++) {
+        if (augmentedMatrix[i][k] !== 0) {
+          [augmentedMatrix[k], augmentedMatrix[i]] = [
+            augmentedMatrix[i],
+            augmentedMatrix[k],
+          ];
+          permute = true;
+          steps.push(`Permutation des lignes ${k + 1} et ${i + 1}`);
+          steps.push(formatAugmentedMatrix(augmentedMatrix));
+          break;
+        }
+      }
+      if (!permute) {
+        steps.push("La matrice est singulière et ne peut pas être inversée.");
+        alert("La matrice est singulière et ne peut pas être inversée.");
+        throw new Error(
+          "La matrice est singulière et ne peut pas être inversée."
+        );
+      }
+      diag = augmentedMatrix[k][k]; // Mettre à jour la diagonale après permutation
+    }
+
+    // Normalisation de la ligne
+    for (let j = 0; j < 2 * n; j++) {
+      augmentedMatrix[k][j] /= diag;
+    }
+    steps.push(`Normalisation de la ligne ${k + 1}`);
+    steps.push(formatAugmentedMatrix(augmentedMatrix));
+
+    // Élimination des éléments au-dessus de la diagonale
+    for (let i = 0; i < k; i++) {
+      const factor = augmentedMatrix[i][k];
+      for (let j = 0; j < 2 * n; j++) {
+        augmentedMatrix[i][j] -= factor * augmentedMatrix[k][j];
+      }
+      steps.push(
+        `Opération de ligne ${i + 1} : r_${i + 1} - (${factor}) * r_${k + 1}`
+      );
+      steps.push(formatAugmentedMatrix(augmentedMatrix));
+    }
+
+    // Élimination des éléments en-dessous de la diagonale
+    for (let i = k + 1; i < n; i++) {
+      const factor = augmentedMatrix[i][k];
+      for (let j = 0; j < 2 * n; j++) {
+        augmentedMatrix[i][j] -= factor * augmentedMatrix[k][j];
+      }
+      steps.push(
+        `Opération de ligne ${i + 1} : r_${i + 1} - (${factor}) * r_${k + 1}`
+      );
+      steps.push(formatAugmentedMatrix(augmentedMatrix));
+    }
+    steps.push(`Matrice augmentée après l'itération ${k + 1}:`);
+    steps.push(formatAugmentedMatrix(augmentedMatrix));
+    steps.push("");
+  }
+
+  // Séparer la matrice inverse de la matrice augmentée
+  const inverseMatrix = augmentedMatrix.map((row) => row.slice(n));
+
+  return { matrix: inverseMatrix, steps };
 }
+
 
 export function resolveDiagonal(matrix: number[][]): {
   matrix: number[][]; // The final reduced matrix
