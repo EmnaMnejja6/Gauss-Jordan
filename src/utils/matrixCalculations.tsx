@@ -99,8 +99,13 @@ export function gaussJordanBanded(
   matrix: number[][],
   k: number
 ): {
+<<<<<<< HEAD
   matrix: number[][];
   steps: string[];
+=======
+  matrix: number[][],
+  steps: string[]
+>>>>>>> 57513abf8dc2090188ec96c4f137f8967b91582c
 } {
   const steps: string[] = [];
   const n = matrix.length;
@@ -150,6 +155,7 @@ export function gaussJordanBanded(
       }
     }
 
+<<<<<<< HEAD
     steps.push(
       `\\left(\\begin{matrix} ${formatAugmentedMatrix(
         matrix
@@ -160,6 +166,12 @@ export function gaussJordanBanded(
   steps.push(
     `\\text{Nombre total d'opérations arithmétiques : ${operationsCount}}`
   );
+=======
+    steps.push(`\\left(\\begin{matrix} ${formatAugmentedMatrix(matrix)} \\end{matrix}\\right)`);
+  }
+
+  steps.push(`\\text{Nombre total d'opérations arithmétiques : ${operationsCount}}`);
+>>>>>>> 57513abf8dc2090188ec96c4f137f8967b91582c
   return { matrix, steps };
 }
 
