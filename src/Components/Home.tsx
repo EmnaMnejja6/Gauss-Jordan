@@ -2,7 +2,7 @@ import React from "react";
 import { MathJax, MathJaxContext } from "better-react-mathjax";
 import { useNavigate } from "react-router-dom";
 
-const GaussJordan: React.FC = () => {
+const Home: React.FC = () => {
   const navigate = useNavigate();
 
   return (
@@ -71,7 +71,8 @@ const styles = {
     minHeight: "100vh",
     padding: "20px",
     boxSizing: "border-box" as const,
-    backgroundColor: "#f9f9f9",
+    // backgroundColor: "#f9f9f9",
+    backgroundColor: "white",
   },
   leftContainer: {
     flex: 1,
@@ -139,4 +140,4 @@ const styles = {
   },
 };
 
-export default GaussJordan;
+export default Home;

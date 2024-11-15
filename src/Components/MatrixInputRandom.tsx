@@ -114,14 +114,27 @@ const SystemResolution: React.FC = () => {
 
       <div className="button-container mt-3">
         <button className="btn btn-danger ms-2" onClick={handleClearMatrix}>
+          <span>
+            <i
+              style={{ fontSize: "16px", color: "white", marginRight: "5px" }}
+              className="bx bxs-trash-alt"
+            ></i>
+          </span>
           Effacer
         </button>
 
         <button className="btn btn-warning ms-2" onClick={handleRandomMatrix}>
+          <span>
+            <i style={{ fontSize: "18px" }} className="bx bx-refresh"></i>
+          </span>{" "}
           Générer
         </button>
         <br />
-        <button className="btn btn-primary" onClick={handleResolution}>
+        <button
+          style={{ marginTop: "10px", width: "600px", fontSize: "18px" }}
+          className="btn btn-primary"
+          onClick={handleResolution}
+        >
           Résolution
         </button>
       </div>

@@ -232,6 +232,12 @@ const MatrixInputManual: React.FC = () => {
           Résolution
         </button>
         <button className="btn btn-danger ms-2" onClick={handleClearMatrix}>
+          <span>
+            <i
+              style={{ fontSize: "16px", color: "white" }}
+              className="bx bxs-trash-alt"
+            ></i>
+          </span>{" "}
           Effacer
         </button>
       </div>

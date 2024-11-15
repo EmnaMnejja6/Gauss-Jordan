@@ -15,6 +15,7 @@ const About: React.FC = () => {
         marginTop: "80px",
         marginLeft: "420px",
         maxWidth: "150vh",
+        boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.2)",
       }}
     >
       <h2 style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>À propos</h2>
