@@ -150,7 +150,6 @@ export function gaussJordanBanded(
       }
     }
 
-<<<<<<< HEAD
     steps.push(
       `\\left(\\begin{matrix} ${formatAugmentedMatrix(
         matrix
@@ -161,12 +160,10 @@ export function gaussJordanBanded(
   steps.push(
     `\\text{Nombre total d'opérations arithmétiques : ${operationsCount}}`
   );
-=======
     steps.push(`\\left(\\begin{matrix} ${formatAugmentedMatrix(matrix)} \\end{matrix}\\right)`);
-  }
+  
 
   steps.push(`\\text{Nombre total d'opérations arithmétiques : ${operationsCount}}`);
->>>>>>> 57513abf8dc2090188ec96c4f137f8967b91582c
   return { matrix, steps };
 }
 
@@ -371,18 +368,16 @@ export function gaussJordanWithoutPivot(matrix: number[][]): {
 
 // Helper function to format the augmented matrix for LaTeX display
 function formatAugmentedMatrix(matrix: number[][]): string {
-  return matrix
-    .map(
-      (row) =>
-        row
-          .slice(0, -1) // Get all elements except the last one
-          .map((value) => toFraction(value))
-          .join(" & ") +
-        " & | & " +
-        toFraction(row[row.length - 1]) // Add the last element with a separator
-    )
+  const n = matrix.length;
+  const formattedMatrix = matrix
+    .map(row => {
+      const leftSide = row.slice(0, n).map(cell => parseFloat(cell.toFixed(2)).toString()).join(" & ");
+      const rightSide = row.slice(n).map(cell => parseFloat(cell.toFixed(2)).toString()).join(" & ");
+      return `${leftSide} & \\vert & ${rightSide}`;// Adds a vertical line between the two parts
+    })
     .join(" \\\\ ");
-}
+  
+    return `\\begin{pmatrix} ${formattedMatrix} \\end{pmatrix}`;}
 
 // Helper function to find the greatest common divisor
 function greatestCommonDivisor(a: number, b: number): number {
@@ -534,7 +529,7 @@ export function inverseMatrix(mat: number[][]): {
   steps.push("Matrice augmentée initiale :");
   steps.push(formatAugmentedMatrix(augmentedMatrix));
 
-  let factor: number, diag: number;
+  let diag: number;
   let permute: boolean;
 
   // Gauss-Jordan Elimination
@@ -556,9 +551,9 @@ export function inverseMatrix(mat: number[][]): {
       }
       if (!permute) {
         steps.push("La matrice est singulière et ne peut pas être inversée.");
-        alert("La matrice est singulière et ne peut pas");
+        alert("La matrice est singulière et ne peut pas être inversée.");
         throw new Error(
-          "La matrice est singulière et ne peut pas etre inversée."
+          "La matrice est singulière et ne peut pas être inversée."
         );
       }
       diag = augmentedMatrix[k][k]; // Mettre à jour la diagonale après permutation
@@ -604,6 +599,7 @@ export function inverseMatrix(mat: number[][]): {
 
   return { matrix: inverseMatrix, steps };
 }
+
 
 export function resolveDiagonal(matrix: number[][]): {
   matrix: number[][]; // The final reduced matrix
