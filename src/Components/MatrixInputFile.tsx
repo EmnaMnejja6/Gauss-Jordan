@@ -19,6 +19,8 @@ const MatrixInputFile: React.FC = () => {
   const [matrixType, setMatrixType] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [fileImported, setFileImported] = useState<boolean>(false);
+  const [solutionFile, setSolutionFile] = useState<string | null>(null);
+
 
   const handleMatrixSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const size = parseInt(e.target.value, 10);
@@ -28,7 +30,7 @@ const MatrixInputFile: React.FC = () => {
     setMatrixSize(size);
     setMatrix(newMatrix);
   };
-
+/*
   const handleResolution = () => {
     try {
       const matrixCopy = matrix.map((row) => [...row]);
@@ -37,6 +39,29 @@ const MatrixInputFile: React.FC = () => {
       setSolutionMatrix(result.matrix);
       setSteps(result.steps);
       setShowSteps(!(fileImported && matrixSize > 10));
+    } catch (error) {
+      setError("Erreur lors de la résolution.");
+    }
+  };*/
+  const handleResolution = () => {
+    try {
+      const matrixCopy = matrix.map((row) => [...row]);
+      const result = gaussJordanWithPivot(matrixCopy);
+      setSolutionMatrix(result.matrix);
+      setSteps(result.steps);
+
+      if (matrixSize > 10) {
+        const solutionText = result.matrix
+        .map((row, index) => `x${index + 1} = ${row[row.length - 1].toFixed(4)}`)
+        .join("\n");
+
+        const blob = new Blob([solutionText], { type: "text/plain" });
+        const fileUrl = URL.createObjectURL(blob);
+        setSolutionFile(fileUrl);
+      } else {
+        setShowSteps(true);
+        setSolutionFile(null);
+      }
     } catch (error) {
       setError("Erreur lors de la résolution.");
     }
@@ -128,8 +153,16 @@ const MatrixInputFile: React.FC = () => {
           Résolution
         </button>
       </div>
+      {matrixSize > 10 && solutionFile && (
+        <div>
+          <h2>Solution </h2>
+          <a href={solutionFile} download="solution.txt" className="btn btn-success">
+            Télécharger la solution
+          </a>
+        </div>
+      )}
 
-      {solutionMatrix && (
+      {solutionMatrix && matrixSize <= 10 && (
         <div>
           <h2>Résolution du système</h2>
           <MathJaxContext>
