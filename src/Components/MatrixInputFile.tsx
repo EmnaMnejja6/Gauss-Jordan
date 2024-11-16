@@ -30,19 +30,7 @@ const MatrixInputFile: React.FC = () => {
     setMatrixSize(size);
     setMatrix(newMatrix);
   };
-/*
-  const handleResolution = () => {
-    try {
-      const matrixCopy = matrix.map((row) => [...row]);
-      let result;
-      result = gaussJordanWithPivot(matrix);
-      setSolutionMatrix(result.matrix);
-      setSteps(result.steps);
-      setShowSteps(!(fileImported && matrixSize > 10));
-    } catch (error) {
-      setError("Erreur lors de la résolution.");
-    }
-  };*/
+
   const handleResolution = () => {
     try {
       const matrixCopy = matrix.map((row) => [...row]);
