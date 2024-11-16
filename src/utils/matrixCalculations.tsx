@@ -160,10 +160,15 @@ export function gaussJordanBanded(
   steps.push(
     `\\text{Nombre total d'opérations arithmétiques : ${operationsCount}}`
   );
-    steps.push(`\\left(\\begin{matrix} ${formatAugmentedMatrix(matrix)} \\end{matrix}\\right)`);
-  
+  steps.push(
+    `\\left(\\begin{matrix} ${formatAugmentedMatrix(
+      matrix
+    )} \\end{matrix}\\right)`
+  );
 
-  steps.push(`\\text{Nombre total d'opérations arithmétiques : ${operationsCount}}`);
+  steps.push(
+    `\\text{Nombre total d'opérations arithmétiques : ${operationsCount}}`
+  );
   return { matrix, steps };
 }
 
@@ -317,7 +322,7 @@ export function gaussJordanWithoutPivot(matrix: number[][]): {
     }
 
     // Log after normalization
-    steps.push(`\\text{Normalize } r_${k + 1}`);
+    steps.push(`\\text{ Normalisation de } r_${k + 1}`);
     steps.push(
       `\\left(\\begin{matrix} ${formatAugmentedMatrix(
         matrix
@@ -331,11 +336,7 @@ export function gaussJordanWithoutPivot(matrix: number[][]): {
       }
 
       // Log after each row operation
-      steps.push(
-        `\\text{Row operation } r_${i + 1} - (${toFraction(multiplier)}) r_${
-          k + 1
-        }`
-      );
+      steps.push(`\\ r_${i + 1} - (${toFraction(multiplier)}) r${k + 1}`);
       steps.push(
         `\\left(\\begin{matrix} ${formatAugmentedMatrix(
           matrix
@@ -370,14 +371,21 @@ export function gaussJordanWithoutPivot(matrix: number[][]): {
 function formatAugmentedMatrix(matrix: number[][]): string {
   const n = matrix.length;
   const formattedMatrix = matrix
-    .map(row => {
-      const leftSide = row.slice(0, n).map(cell => parseFloat(cell.toFixed(2)).toString()).join(" & ");
-      const rightSide = row.slice(n).map(cell => parseFloat(cell.toFixed(2)).toString()).join(" & ");
-      return `${leftSide} & \\vert & ${rightSide}`;// Adds a vertical line between the two parts
+    .map((row) => {
+      const leftSide = row
+        .slice(0, n)
+        .map((cell) => parseFloat(cell.toFixed(2)).toString())
+        .join(" & ");
+      const rightSide = row
+        .slice(n)
+        .map((cell) => parseFloat(cell.toFixed(2)).toString())
+        .join(" & ");
+      return `${leftSide} & \\vert & ${rightSide}`; // Adds a vertical line between the two parts
     })
     .join(" \\\\ ");
-  
-    return `\\begin{pmatrix} ${formattedMatrix} \\end{pmatrix}`;}
+
+  return `\\begin{pmatrix} ${formattedMatrix} \\end{pmatrix}`;
+}
 
 // Helper function to find the greatest common divisor
 function greatestCommonDivisor(a: number, b: number): number {
@@ -432,11 +440,7 @@ export function gaussJordanWithPivot(matrix: number[][]): {
       matrix[k][j] /= pivot;
     }
 
-    steps.push(
-      `\\left(\\begin{matrix} ${formatAugmentedMatrix(
-        matrix
-      )} \\end{matrix}\\right)`
-    );
+    steps.push(`${formatAugmentedMatrix(matrix)}`);
     console.log(`Matrice après normalisation de la ligne ${k + 1}:`, matrix);
 
     // Opérations sur les lignes ci-dessous
@@ -447,16 +451,8 @@ export function gaussJordanWithPivot(matrix: number[][]): {
       }
 
       // Log after each row operation
-      steps.push(
-        `\\text{Row operation } r_${i + 1} - (${toFraction(multiplier)}) r_${
-          k + 1
-        }`
-      );
-      steps.push(
-        `\\left(\\begin{matrix} ${formatAugmentedMatrix(
-          matrix
-        )} \\end{matrix}\\right)`
-      );
+      steps.push(`r_${i + 1} - (${toFraction(multiplier)}) r_${k + 1}`);
+      steps.push(`${formatAugmentedMatrix(matrix)}`);
     }
 
     for (let i = k + 1; i < n; i++) {
@@ -465,16 +461,8 @@ export function gaussJordanWithPivot(matrix: number[][]): {
         matrix[i][j] -= multiplier * matrix[k][j];
       }
 
-      steps.push(
-        `\\text{Row operation } r_${i + 1} - (${toFraction(multiplier)}) r_${
-          k + 1
-        }`
-      );
-      steps.push(
-        `\\left(\\begin{matrix} ${formatAugmentedMatrix(
-          matrix
-        )} \\end{matrix}\\right)`
-      );
+      steps.push(`r_${i + 1} - (${toFraction(multiplier)}) r_${k + 1}`);
+      steps.push(`${formatAugmentedMatrix(matrix)}`);
     }
   }
 
@@ -599,7 +587,6 @@ export function inverseMatrix(mat: number[][]): {
 
   return { matrix: inverseMatrix, steps };
 }
-
 
 export function resolveDiagonal(matrix: number[][]): {
   matrix: number[][]; // The final reduced matrix
