@@ -1,7 +1,7 @@
 {
   /*This File that contains all the functions and algorithms*/
 }
-function isBand(mat: number[][], k: { value: number }): boolean {
+function isBand(mat: number[][], k: number): boolean {
   let n = mat.length;
   let k1 = 0,
     k2 = 0;
@@ -25,7 +25,7 @@ function isBand(mat: number[][], k: { value: number }): boolean {
     return false;
   }
 
-  k.value = k1;
+  k = k1;
   return true;
 }
 /*
@@ -95,6 +95,104 @@ export function gaussJordanBanded(
   return { matrix, steps };
 }
 */
+export function isLowerTriangular(mat: number[][]): boolean {
+  return false;
+}
+export function isUpperTriangular(mat: number[][]): boolean {
+  return false;
+}
+export function isSymmetric(mat: number[][]): boolean {
+  const n = mat.length;
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      if (mat[i][j] !== mat[j][i]) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+export function isPositiveDefinite(mat: number[][]): boolean {
+  const n = mat.length;
+  const L: number[][] = Array.from({ length: n }, () => Array(n).fill(0));
+
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j <= i; j++) {
+      let sum = 0;
+
+      for (let k = 0; k < j; k++) {
+        sum += L[i][k] * L[j][k];
+      }
+
+      if (i === j) {
+        const val = mat[i][i] - sum;
+        if (val <= 0) {
+          return false;
+        }
+        L[i][j] = Math.sqrt(val);
+      } else {
+        L[i][j] = (mat[i][j] - sum) / L[j][j];
+      }
+    }
+  }
+  return true;
+}
+export function isSymmetricPositiveDefinite(mat: number[][]): boolean {
+  return isSymmetric(mat) && isPositiveDefinite(mat);
+}
+export function isInvertible(mat: number[][]): boolean {
+  const n = mat.length;
+  for (let i = 0; i < n; i++) {
+    if (mat[i][i] === 0) {
+      let permuted = false;
+      for (let j = i + 1; j < n; j++) {
+        if (mat[j][i] !== 0) {
+          [mat[i], mat[j]] = [mat[j], mat[i]]; // Swap rows
+          permuted = true;
+          break;
+        }
+      }
+      if (!permuted) {
+        console.log("The matrix is singular and cannot be inverted.");
+        return false;
+      }
+    }
+  }
+  return true;
+}
+export function isDiagonallyDominant(matrix: number[][]): boolean {
+  const n = matrix.length;
+
+  for (let i = 0; i < n; i++) {
+    let diagonalElement = Math.abs(matrix[i][i]);
+    let sumOfOffDiagonal = 0;
+
+    // Sum all non-diagonal elements in the row
+    for (let j = 0; j < n; j++) {
+      if (i !== j) {
+        sumOfOffDiagonal += Math.abs(matrix[i][j]);
+      }
+    }
+
+    // Check if the diagonal element is greater than or equal to the sum of off-diagonal elements
+    if (diagonalElement < sumOfOffDiagonal) {
+      return false; // The matrix is not diagonally dominant
+    }
+  }
+
+  return true; // The matrix is diagonally dominant
+}
+
+export function augmentMatrix(mat: number[][]): number[][] {
+  const n = mat.length;
+  return mat.map((row, i) => [
+    ...row,
+    ...Array(n)
+      .fill(0)
+      .map((_, j) => (j === i ? 1 : 0)), // Add identity matrix
+  ]);
+}
 export function gaussJordanBanded(
   matrix: number[][],
   k: number
@@ -170,96 +268,6 @@ export function gaussJordanBanded(
     `\\text{Nombre total d'opérations arithmétiques : ${operationsCount}}`
   );
   return { matrix, steps };
-}
-
-export function isSymmetric(mat: number[][]): boolean {
-  const n = mat.length;
-  for (let i = 0; i < n; i++) {
-    for (let j = i + 1; j < n; j++) {
-      if (mat[i][j] !== mat[j][i]) {
-        return false;
-      }
-    }
-  }
-  return true;
-}
-
-export function isPositiveDefinite(mat: number[][]): boolean {
-  const n = mat.length;
-  const L: number[][] = Array.from({ length: n }, () => Array(n).fill(0));
-
-  for (let i = 0; i < n; i++) {
-    for (let j = 0; j <= i; j++) {
-      let sum = 0;
-
-      for (let k = 0; k < j; k++) {
-        sum += L[i][k] * L[j][k];
-      }
-
-      if (i === j) {
-        const val = mat[i][i] - sum;
-        if (val <= 0) {
-          return false;
-        }
-        L[i][j] = Math.sqrt(val);
-      } else {
-        L[i][j] = (mat[i][j] - sum) / L[j][j];
-      }
-    }
-  }
-  return true;
-}
-export function augmentMatrix(mat: number[][]): number[][] {
-  const n = mat.length;
-  return mat.map((row, i) => [
-    ...row,
-    ...Array(n)
-      .fill(0)
-      .map((_, j) => (j === i ? 1 : 0)), // Add identity matrix
-  ]);
-}
-
-export function isInvertible(mat: number[][]): boolean {
-  const n = mat.length;
-  for (let i = 0; i < n; i++) {
-    if (mat[i][i] === 0) {
-      let permuted = false;
-      for (let j = i + 1; j < n; j++) {
-        if (mat[j][i] !== 0) {
-          [mat[i], mat[j]] = [mat[j], mat[i]]; // Swap rows
-          permuted = true;
-          break;
-        }
-      }
-      if (!permuted) {
-        console.log("The matrix is singular and cannot be inverted.");
-        return false;
-      }
-    }
-  }
-  return true;
-}
-export function isDiagonallyDominant(matrix: number[][]): boolean {
-  const n = matrix.length;
-
-  for (let i = 0; i < n; i++) {
-    let diagonalElement = Math.abs(matrix[i][i]);
-    let sumOfOffDiagonal = 0;
-
-    // Sum all non-diagonal elements in the row
-    for (let j = 0; j < n; j++) {
-      if (i !== j) {
-        sumOfOffDiagonal += Math.abs(matrix[i][j]);
-      }
-    }
-
-    // Check if the diagonal element is greater than or equal to the sum of off-diagonal elements
-    if (diagonalElement < sumOfOffDiagonal) {
-      return false; // The matrix is not diagonally dominant
-    }
-  }
-
-  return true; // The matrix is diagonally dominant
 }
 
 export function invertMatrix(mat: number[][]): number[][] | null {
@@ -367,31 +375,6 @@ export function gaussJordanWithoutPivot(matrix: number[][]): {
   return { matrix, steps };
 }
 
-// Helper function to format the augmented matrix for LaTeX display
-function formatAugmentedMatrix(matrix: number[][]): string {
-  const n = matrix.length;
-  const formattedMatrix = matrix
-    .map((row) => {
-      const leftSide = row
-        .slice(0, n)
-        .map((cell) => parseFloat(cell.toFixed(2)).toString())
-        .join(" & ");
-      const rightSide = row
-        .slice(n)
-        .map((cell) => parseFloat(cell.toFixed(2)).toString())
-        .join(" & ");
-      return `${leftSide} & \\vert & ${rightSide}`; // Adds a vertical line between the two parts
-    })
-    .join(" \\\\ ");
-
-  return `\\begin{pmatrix} ${formattedMatrix} \\end{pmatrix}`;
-}
-
-// Helper function to find the greatest common divisor
-function greatestCommonDivisor(a: number, b: number): number {
-  return b === 0 ? a : greatestCommonDivisor(b, a % b);
-}
-
 export function gaussJordanWithPivot(matrix: number[][]): {
   matrix: number[][];
   steps: string[];
@@ -467,37 +450,6 @@ export function gaussJordanWithPivot(matrix: number[][]): {
   }
 
   return { matrix, steps };
-}
-
-function toFraction(value: number): string {
-  if (Number.isInteger(value)) {
-    return value.toString();
-  } else {
-    const tolerance = 1e-6;
-    let numerator = value;
-    let denominator = 1;
-
-    while (Math.abs(numerator - Math.round(numerator)) > tolerance) {
-      numerator *= 10;
-      denominator *= 10;
-    }
-
-    const gcd = greatestCommonDivisor(Math.round(numerator), denominator);
-    numerator = Math.round(numerator) / gcd;
-    denominator = denominator / gcd;
-
-    if (denominator === 1) {
-      return numerator.toString();
-    } else {
-      return `\\frac{${numerator}}{${denominator}}`;
-    }
-  }
-}
-
-export function formatMatrix(matrix: number[][]): string {
-  return `\\begin{bmatrix} ${matrix
-    .map((row) => row.join(" & "))
-    .join(" \\\\ ")} \\end{bmatrix}`;
 }
 
 export function inverseMatrix(mat: number[][]): {
@@ -588,7 +540,7 @@ export function inverseMatrix(mat: number[][]): {
   return { matrix: inverseMatrix, steps };
 }
 
-export function resolveDiagonal(matrix: number[][]): {
+export function resolveDiagonalDominant(matrix: number[][]): {
   matrix: number[][]; // The final reduced matrix
   steps: string[]; // The steps during the calculation
 } {
@@ -612,6 +564,18 @@ export function resolveSymmetricPositiveDefinite(matrix: number[][]): {
   return gaussJordanWithoutPivot(matrix);
 }
 
+export function resolveUpperTriangular(matrix: number[][]): {
+  matrix: number[][];
+  steps: string[];
+} {
+  return gaussJordanWithoutPivot(matrix);
+}
+export function resolveLowerTriangular(matrix: number[][]): {
+  matrix: number[][];
+  steps: string[];
+} {
+  return gaussJordanWithoutPivot(matrix);
+}
 export function resolveBand(
   matrix: number[][],
   k: number
@@ -623,4 +587,60 @@ export function resolveBand(
     throw new Error("The matrix is not diagonally dominant.");
   }
   return gaussJordanBanded(matrix, k);
+}
+
+// Helper function to format the augmented matrix for LaTeX display
+function formatAugmentedMatrix(matrix: number[][]): string {
+  const n = matrix.length;
+  const formattedMatrix = matrix
+    .map((row) => {
+      const leftSide = row
+        .slice(0, n)
+        .map((cell) => parseFloat(cell.toFixed(2)).toString())
+        .join(" & ");
+      const rightSide = row
+        .slice(n)
+        .map((cell) => parseFloat(cell.toFixed(2)).toString())
+        .join(" & ");
+      return `${leftSide} & \\vert & ${rightSide}`; // Adds a vertical line between the two parts
+    })
+    .join(" \\\\ ");
+
+  return `\\begin{matrix} ${formattedMatrix} \\end{matrix}`;
+}
+
+// Helper function to find the greatest common divisor
+function greatestCommonDivisor(a: number, b: number): number {
+  return b === 0 ? a : greatestCommonDivisor(b, a % b);
+}
+
+function toFraction(value: number): string {
+  if (Number.isInteger(value)) {
+    return value.toString();
+  } else {
+    const tolerance = 1e-6;
+    let numerator = value;
+    let denominator = 1;
+
+    while (Math.abs(numerator - Math.round(numerator)) > tolerance) {
+      numerator *= 10;
+      denominator *= 10;
+    }
+
+    const gcd = greatestCommonDivisor(Math.round(numerator), denominator);
+    numerator = Math.round(numerator) / gcd;
+    denominator = denominator / gcd;
+
+    if (denominator === 1) {
+      return numerator.toString();
+    } else {
+      return `\\frac{${numerator}}{${denominator}}`;
+    }
+  }
+}
+
+export function formatMatrix(matrix: number[][]): string {
+  return `\\begin{bmatrix} ${matrix
+    .map((row) => row.join(" & "))
+    .join(" \\\\ ")} \\end{bmatrix}`;
 }

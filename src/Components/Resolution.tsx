@@ -11,8 +11,8 @@ const Resolution: React.FC = () => {
     <div
       className="container card shadow p-4 mb-5 bg-white rounded "
       style={{
-        maxWidth: "800px",
-        marginLeft: "480px",
+        maxWidth: "1000px",
+        marginLeft: "380px",
         marginTop: "80px",
         fontSize: "18px",
       }}

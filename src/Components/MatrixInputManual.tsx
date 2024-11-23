@@ -2,41 +2,53 @@ import React, { useState } from "react";
 import { MathJax, MathJaxContext } from "better-react-mathjax";
 import {
   gaussJordanWithPivot,
-  resolveDiagonal,
+  resolveDiagonalDominant,
   resolveBand,
   resolveSymmetricPositiveDefinite,
+  resolveUpperTriangular,
+  resolveLowerTriangular,
 } from "../utils/matrixCalculations";
 
 const MatrixInputManual: React.FC = () => {
-  const [matrixSize, setMatrixSize] = useState<number>(2);
-  const [matrix, setMatrix] = useState<number[][]>(
-    Array(2).fill(Array(3).fill(0))
-  ); // Initial size n x (n + 1)
+  const [matrixSize, setMatrixSize] = useState(2);
+  const [matrixType, setMatrixType] = useState("");
+  const [bandWidth, setBandWidth] = useState(1);
+  const [matrix, setMatrix] = useState(
+    Array.from({ length: matrixSize }, () => Array(matrixSize).fill(0))
+  );
+  const [vector, setVector] = useState<number[]>(Array(2).fill(0));
   const [solutionMatrix, setSolutionMatrix] = useState<number[][] | null>(null);
   const [steps, setSteps] = useState<string[]>([]);
   const [showSteps, setShowSteps] = useState<boolean>(true);
-  const [matrixType, setMatrixType] = useState<string | null>(null);
-  const [bandWidth, setBandWidth] = useState<number>(0); // New state for band width
   const [error, setError] = useState<string | null>(null);
 
   const handleResolution = () => {
     try {
-      const matrixCopy = matrix.map((row) => [...row]);
+      const augmentedMatrix = matrix.map((row, index) => [
+        ...row,
+        vector[index],
+      ]);
       let result;
 
       switch (matrixType) {
-        case "Diagonal":
-          result = resolveDiagonal(matrixCopy);
+        case "Upper Triangular":
+          result = resolveUpperTriangular(augmentedMatrix);
+          break;
+        case "Lower Triangular":
+          result = resolveLowerTriangular(augmentedMatrix);
+          break;
+        case "Diagonal Dominant":
+          result = resolveDiagonalDominant(augmentedMatrix);
           break;
         case "Symmetric Positive Definite":
-          result = resolveSymmetricPositiveDefinite(matrixCopy);
+          result = resolveSymmetricPositiveDefinite(augmentedMatrix);
           break;
         case "Band":
-          result = resolveBand(matrixCopy, bandWidth);
+          result = resolveBand(augmentedMatrix, bandWidth);
           break;
         case "Dense":
         default:
-          result = gaussJordanWithPivot(matrixCopy);
+          result = gaussJordanWithPivot(augmentedMatrix);
           break;
       }
 
@@ -49,11 +61,13 @@ const MatrixInputManual: React.FC = () => {
 
   const handleMatrixSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const size = parseInt(e.target.value, 10);
-    const newMatrix = Array(size)
-      .fill(0)
-      .map(() => Array(size + 1).fill(0));
     setMatrixSize(size);
-    setMatrix(newMatrix);
+    setMatrix(
+      Array(size)
+        .fill(0)
+        .map(() => Array(size).fill(0))
+    );
+    setVector(Array(size).fill(0));
   };
 
   const handleMatrixChange = (
@@ -61,25 +75,73 @@ const MatrixInputManual: React.FC = () => {
     rowIndex: number,
     colIndex: number
   ) => {
-    const newMatrix = matrix.map((row, i) =>
-      row.map((value, j) =>
-        i === rowIndex && j === colIndex
-          ? parseFloat(e.target.value) || 0
-          : value
-      )
+    const value = parseFloat(e.target.value) || 0;
+
+    const updatedMatrix = matrix.map((row, rIdx) =>
+      row.map((val, cIdx) => {
+        if (rIdx === rowIndex && cIdx === colIndex) return value;
+
+        // Ensure symmetry for symmetric positive definite matrices
+        if (
+          matrixType === "Symmetric Positive Definite" &&
+          rIdx < cIdx &&
+          rowIndex === cIdx &&
+          colIndex === rIdx
+        ) {
+          return value;
+        }
+
+        return val;
+      })
     );
-    setMatrix(newMatrix);
+
+    // Ensure symmetry for symmetric positive definite matrices
+    if (matrixType === "Symmetric Positive Definite") {
+      updatedMatrix[colIndex][rowIndex] = value;
+    }
+
+    // Validate diagonal dominance (only for this matrix type)
+    if (matrixType === "Diagonal Dominant") {
+      const diagonalElement = Math.abs(updatedMatrix[rowIndex][rowIndex]);
+      const rowSum = updatedMatrix[rowIndex].reduce(
+        (sum, val, idx) => (idx !== rowIndex ? sum + Math.abs(val) : sum),
+        0
+      );
+
+      if (diagonalElement < rowSum) {
+        alert(
+          `Valeur invalide: ligne ${rowIndex + 1} doit satisfaire |a[${
+            rowIndex + 1
+          },${rowIndex + 1}]| ≥ ${rowSum}.`
+        );
+        return; // Do not update the matrix if diagonal dominance is violated
+      }
+    }
+
+    setMatrix(updatedMatrix);
+  };
+
+  const handleVectorChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number
+  ) => {
+    const newVector = vector.map((value, i) =>
+      i === index ? parseFloat(e.target.value) || 0 : value
+    );
+    setVector(newVector);
   };
 
   const handleClearMatrix = () => {
-    const newMatrix = Array(matrixSize)
-      .fill(0)
-      .map(() => Array(matrixSize + 1).fill(0));
-    setMatrix(newMatrix);
+    setMatrix(
+      Array(matrixSize)
+        .fill(0)
+        .map(() => Array(matrixSize).fill(0))
+    );
+    setVector(Array(matrixSize).fill(0));
     setSolutionMatrix(null);
     setSteps([]);
-    setMatrixType(null);
-    setBandWidth(0); // Reset band width
+    setMatrixType("dense");
+    setBandWidth(0);
     setError(null);
   };
 
@@ -88,6 +150,11 @@ const MatrixInputManual: React.FC = () => {
       .map((row) => row.map((value) => value.toString()).join("&"))
       .join("\\\\");
     return `\\left(\\begin{matrix}${matrixString}\\end{matrix}\\right)`;
+  };
+
+  const renderVector = () => {
+    const vectorString = vector.map((value) => value.toString()).join("\\\\");
+    return `\\left(\\begin{matrix}${vectorString}\\end{matrix}\\right)`;
   };
 
   const renderSolutionMatrix = () => {
@@ -99,119 +166,100 @@ const MatrixInputManual: React.FC = () => {
     return `\\left(\\begin{matrix}${matrixString}\\end{matrix}\\right)`;
   };
 
+  const handleDownloadMatrix = () => {
+    let matrixTypeCode = "";
+
+    // Map the selected matrix type to its code
+    switch (matrixType) {
+      case "Dense":
+        matrixTypeCode = "dense";
+        break;
+      case "Diagonal Dominant":
+        matrixTypeCode = "dd";
+        break;
+      case "Symmetric Positive Definite":
+        matrixTypeCode = "spd";
+        break;
+      case "lower":
+        matrixTypeCode = "lower";
+        break;
+      case "upper":
+        matrixTypeCode = "upper";
+        break;
+      case "Band":
+        matrixTypeCode = "band";
+        break;
+      default:
+        matrixTypeCode = "unknown";
+    }
+
+    // Construct the content of the file
+    let fileContent = matrixTypeCode + "\n"; // First line contains the matrix type code
+
+    // Augment the matrix with the solution vector b
+    matrix.forEach((row, rowIndex) => {
+      const augmentedRow = [...row, vector[rowIndex]]; // Add the corresponding b value
+      fileContent += augmentedRow.join(" ") + "\n"; // Append the augmented row
+    });
+
+    // Create a downloadable file
+    const blob = new Blob([fileContent], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+
+    // Trigger file download
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "augmented_matrix.txt";
+    link.click();
+
+    // Clean up
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div
       className="container"
-      style={{
-        width: "600px",
-        fontSize: "24px",
-        marginTop: "10px",
-        marginRight: "auto",
-        textAlign: "justify",
-      }}
+      style={{ width: "800px", fontSize: "24px", marginTop: "10px" }}
     >
-      <h2>Saisie de la matrice augmentée</h2>
-      <label>Taille de la matrice: </label>
-      <input
-        type="number"
-        value={matrixSize}
-        onChange={handleMatrixSizeChange}
-        min={2}
-        max={10}
-        className="form-control mb-3"
-        style={{ width: "100px", margin: "0 auto" }}
-      />
-
-      <MathJaxContext>
-        <MathJax dynamic>{`\\[ ${renderMatrix()} \\]`}</MathJax>
-      </MathJaxContext>
-
-      <div className="table-responsive">
-        <table className="table table-bordered">
-          <tbody>
-            {matrix.map((row, rowIndex) => (
-              <tr key={rowIndex}>
-                {row.map((value, colIndex) => (
-                  <td key={colIndex}>
-                    <input
-                      type="number"
-                      value={matrix[rowIndex][colIndex]}
-                      onChange={(e) =>
-                        handleMatrixChange(e, rowIndex, colIndex)
-                      }
-                      className="form-control"
-                    />
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
       <div className="mb-3">
         <h5>Choisir le type de matrice</h5>
-        <div className="form-check">
-          <input
-            type="radio"
-            className="form-check-input"
-            name="matrixType"
-            id="dense"
-            value="Dense"
-            onChange={() => setMatrixType("Dense")}
-          />
-          <label className="form-check-label" htmlFor="dense">
-            Dense
-          </label>
-        </div>
-
-        <div className="form-check">
-          <input
-            type="radio"
-            className="form-check-input"
-            name="matrixType"
-            id="diagonal"
-            value="Diagonal"
-            onChange={() => setMatrixType("Diagonal")}
-          />
-          <label className="form-check-label" htmlFor="diagonal">
-            A diagonale dominante
-          </label>
-        </div>
-        <div className="form-check">
-          <input
-            type="radio"
-            className="form-check-input"
-            name="matrixType"
-            id="symmetricPositiveDefinite"
-            value="Symmetric Positive Definite"
-            onChange={() => setMatrixType("Symmetric Positive Definite")}
-          />
-          <label
-            className="form-check-label"
-            htmlFor="symmetricPositiveDefinite"
-          >
-            Symmetrique définie positive
-          </label>
-        </div>
-        <div className="form-check">
-          <input
-            type="radio"
-            className="form-check-input"
-            name="matrixType"
-            id="band"
-            value="Band"
-            onChange={() => setMatrixType("Band")}
-          />
-          <label className="form-check-label" htmlFor="band">
-            Bande
-          </label>
-        </div>
-
-        {/* Band width input field */}
+        {[
+          { type: "Dense", label: "Dense" },
+          { type: "Diagonal Dominant", label: "Diagonale Dominante" },
+          { type: "lower", label: "Triangulaire Inférieure" },
+          { type: "upper", label: "Triangulaire Supérieure" },
+          {
+            type: "Symmetric Positive Definite",
+            label: "Symétrique Définie Positive",
+          },
+          { type: "Band", label: "Bande" },
+        ].map(({ type, label }, idx) => (
+          <div className="form-check" key={idx}>
+            <input
+              type="radio"
+              className="form-check-input"
+              name="matrixType"
+              id={type}
+              value={type}
+              onChange={() => setMatrixType(type)}
+            />
+            <label className="form-check-label" htmlFor={type}>
+              {label}
+            </label>
+          </div>
+        ))}
         {matrixType === "Band" && (
           <div className="mt-3">
-            <label>Largeur de la bande: </label>
+            <label>
+              Largeur de la bande:{" "}
+              <span style={{ color: "grey", fontSize: "16px" }}>
+                <span style={{ marginRight: "3px" }}>
+                  <i className="bx bxs-error"></i>
+                </span>
+                largeur de la bande supérieur = largeur de la bande inférieure
+              </span>{" "}
+            </label>
+
             <input
               type="number"
               value={bandWidth}
@@ -225,7 +273,80 @@ const MatrixInputManual: React.FC = () => {
         )}
       </div>
 
-      {error && <div className="alert alert-danger">{error}</div>}
+      <h2>Saisie de la matrice A et du vecteur b</h2>
+      <label>Taille de la matrice: </label>
+      <input
+        type="number"
+        value={matrixSize}
+        onChange={handleMatrixSizeChange}
+        min={2}
+        max={10}
+        className="form-control mb-3"
+        style={{ width: "100px", margin: "0 auto" }}
+      />
+
+      <div className="row">
+        <div className="col-md-8">
+          <MathJaxContext>
+            <MathJax dynamic>{`\\[ A = ${renderMatrix()} \\]`}</MathJax>
+          </MathJaxContext>
+
+          <div className="table-responsive">
+            <table className="table table-bordered">
+              <tbody>
+                {matrix.map((row, rowIndex) => (
+                  <tr key={rowIndex}>
+                    {row.map((value, colIndex) => (
+                      <td key={colIndex}>
+                        <input
+                          type="number"
+                          value={value}
+                          onChange={(e) =>
+                            handleMatrixChange(e, rowIndex, colIndex)
+                          }
+                          className="form-control"
+                          disabled={
+                            (matrixType === "lower" && rowIndex < colIndex) ||
+                            (matrixType === "upper" && rowIndex > colIndex) ||
+                            (matrixType === "Symmetric Positive Definite" &&
+                              rowIndex < colIndex) ||
+                            (matrixType === "Band" &&
+                              Math.abs(rowIndex - colIndex) > bandWidth)
+                          }
+                        />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="col-md-4">
+          <MathJaxContext>
+            <MathJax dynamic>{`\\[ b= ${renderVector()} \\]`}</MathJax>
+          </MathJaxContext>
+          <div className="table-responsive">
+            <table className="table table-bordered">
+              <tbody>
+                {vector.map((value, index) => (
+                  <tr key={index}>
+                    <td>
+                      <input
+                        type="number"
+                        value={value}
+                        onChange={(e) => handleVectorChange(e, index)}
+                        className="form-control"
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
       <div className="button-container mt-3">
         <button className="btn btn-primary" onClick={handleResolution}>
@@ -234,11 +355,20 @@ const MatrixInputManual: React.FC = () => {
         <button className="btn btn-danger ms-2" onClick={handleClearMatrix}>
           <span>
             <i
-              style={{ fontSize: "16px", color: "white" }}
+              style={{ fontSize: "16px", color: "white", marginRight: "5px" }}
               className="bx bxs-trash-alt"
             ></i>
-          </span>{" "}
+          </span>
           Effacer
+        </button>
+        <button className="btn btn-success ms-2" onClick={handleDownloadMatrix}>
+          <span>
+            <i
+              style={{ fontSize: "16px", color: "white", marginRight: "5px" }}
+              className="bx bxs-download"
+            ></i>
+          </span>
+          Télécharger la matrice
         </button>
       </div>
 
@@ -246,28 +376,27 @@ const MatrixInputManual: React.FC = () => {
         <div>
           <h2>Résolution du système</h2>
           <MathJaxContext>
-            <MathJax dynamic>{`\\[ b= ${renderSolutionMatrix()} \\]`}</MathJax>
+            <MathJax dynamic>{`\\[ b = ${renderSolutionMatrix()} \\]`}</MathJax>
           </MathJaxContext>
+        </div>
+      )}
+      <button
+        className="btn btn-secondary mt-3"
+        onClick={() => setShowSteps(!showSteps)}
+      >
+        {showSteps ? "Hide Steps" : "Show Steps"}
+      </button>
 
-          <button
-            className="btn btn-secondary mt-3"
-            onClick={() => setShowSteps(!showSteps)}
-          >
-            {showSteps ? "Hide Steps" : "Show Steps"}
-          </button>
-
-          {showSteps && (
-            <div className="steps-container mt-3">
-              <h3>Solution Steps</h3>
-              {steps.map((step, index) => (
-                <div key={index}>
-                  <MathJaxContext>
-                    <MathJax dynamic>{`\\[ ${step} \\]`}</MathJax>
-                  </MathJaxContext>
-                </div>
-              ))}
+      {showSteps && (
+        <div className="steps-container mt-3">
+          <h3>Solution Steps</h3>
+          {steps.map((step, index) => (
+            <div key={index}>
+              <MathJaxContext>
+                <MathJax dynamic>{`\\[ ${step} \\]`}</MathJax>
+              </MathJaxContext>
             </div>
-          )}
+          ))}
         </div>
       )}
     </div>

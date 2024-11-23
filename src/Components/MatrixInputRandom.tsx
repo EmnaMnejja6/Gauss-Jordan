@@ -2,77 +2,24 @@ import React, { useState } from "react";
 import { MathJax, MathJaxContext } from "better-react-mathjax";
 import {
   gaussJordanWithPivot,
-  gaussJordanWithoutPivot,
-  resolveDiagonal,
+  resolveDiagonalDominant,
   resolveBand,
   resolveSymmetricPositiveDefinite,
+  resolveLowerTriangular,
+  resolveUpperTriangular,
 } from "../utils/matrixCalculations";
-
 const SystemResolution: React.FC = () => {
-  const [matrixSize, setMatrixSize] = useState<number>(2);
+  const [matrixSize, setMatrixSize] = useState<number>(3);
+  const [matrixType, setMatrixType] = useState<string>("");
+  const [bandWidth, setBandWidth] = useState<number>(1);
+  const [showSteps, setShowSteps] = useState<boolean>(true);
   const [matrix, setMatrix] = useState<number[][]>(
-    Array(2).fill(Array(3).fill(0))
-  ); // Initial size n x (n + 1)
+    Array(3).fill(Array(3).fill(0))
+  );
+  const [vector, setVector] = useState<number[]>(Array(3).fill(0));
   const [solutionMatrix, setSolutionMatrix] = useState<number[][] | null>(null);
   const [steps, setSteps] = useState<string[]>([]);
-  const [showSteps, setShowSteps] = useState<boolean>(true);
-  const [matrixType, setMatrixType] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [fileImported, setFileImported] = useState<boolean>(false);
-
-  const handleMatrixSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const size = parseInt(e.target.value, 10);
-    const newMatrix = Array(size)
-      .fill(0)
-      .map(() => Array(size + 1).fill(0));
-    setMatrixSize(size);
-    setMatrix(newMatrix);
-  };
-  const handleClearMatrix = () => {
-    const newMatrix = Array(matrixSize)
-      .fill(0)
-      .map(() => Array(matrixSize + 1).fill(0));
-    setMatrix(newMatrix);
-    setSolutionMatrix(null);
-    setSteps([]);
-    setMatrixType(null);
-    setError(null);
-    //
-    setFileImported(false);
-  };
-  const handleResolution = () => {
-    try {
-      const matrixCopy1 = matrix.map((row) => [...row]);
-      const result = gaussJordanWithPivot(matrixCopy1);
-      setSolutionMatrix(result.matrix);
-      setSteps(result.steps);
-      setShowSteps(matrixSize <= 10);
-    } catch (error) {
-      setError("Erreur lors de la résolution.");
-    }
-  };
-
-  const renderMatrix = () => {
-    const matrixString = matrix
-      .map((row) => row.map((value) => value.toString()).join("&"))
-      .join("\\\\");
-    return `\\left(\\begin{matrix}${matrixString}\\end{matrix}\\right)`;
-  };
-
-  const handleRandomMatrix = () => {
-    const newMatrix = Array(matrixSize)
-      .fill(0)
-      .map(() =>
-        Array(matrixSize + 1)
-          .fill(0)
-          .map(() => Math.floor(Math.random() * 20) - 10)
-      ); // Random values between -10 and 10
-
-    setMatrix(newMatrix);
-    setSolutionMatrix(null);
-    setSteps([]);
-    setFileImported(false);
-  };
 
   const renderSolutionMatrix = () => {
     if (!solutionMatrix) return null;
@@ -82,19 +29,214 @@ const SystemResolution: React.FC = () => {
       .join("\\\\");
     return `\\left(\\begin{matrix}${matrixString}\\end{matrix}\\right)`;
   };
+  const handleResolution = () => {
+    try {
+      const augmentedMatrix = matrix.map((row, index) => [
+        ...row,
+        vector[index],
+      ]);
+      let result;
+
+      switch (matrixType) {
+        case "Upper Triangular":
+          result = resolveUpperTriangular(augmentedMatrix);
+          break;
+        case "Lower Triangular":
+          result = resolveLowerTriangular(augmentedMatrix);
+          break;
+        case "Diagonal Dominant":
+          result = resolveDiagonalDominant(augmentedMatrix);
+          break;
+        case "Symmetric Positive Definite":
+          result = resolveSymmetricPositiveDefinite(augmentedMatrix);
+          break;
+        case "Band":
+          result = resolveBand(augmentedMatrix, bandWidth);
+          break;
+        case "Dense":
+        default:
+          result = gaussJordanWithPivot(augmentedMatrix);
+          break;
+      }
+
+      setSolutionMatrix(result.matrix);
+      setSteps(result.steps);
+    } catch (error) {
+      setError("Erreur lors de la résolution.");
+    }
+  };
+
+  const handleMatrixSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const size = parseInt(e.target.value, 15);
+    setMatrixSize(size);
+    setMatrix(Array(size).fill(Array(size).fill(0)));
+    setVector(Array(size).fill(0));
+  };
+
+  const handleRandomMatrix = () => {
+    let newMatrix = Array(matrixSize)
+      .fill(0)
+      .map(() => Array(matrixSize).fill(0));
+
+    if (matrixType === "Dense") {
+      // Full matrix
+      newMatrix = Array(matrixSize)
+        .fill(0)
+        .map(() =>
+          Array(matrixSize)
+            .fill(0)
+            .map(() => Math.floor(Math.random() * 20) - 10)
+        );
+    } else if (matrixType === "lower") {
+      // Lower triangular
+      for (let i = 0; i < matrixSize; i++) {
+        for (let j = 0; j < matrixSize; j++) {
+          newMatrix[i][j] = j <= i ? Math.floor(Math.random() * 20) - 10 : 0;
+        }
+      }
+    } else if (matrixType === "upper") {
+      // Upper triangular
+      for (let i = 0; i < matrixSize; i++) {
+        for (let j = 0; j < matrixSize; j++) {
+          newMatrix[i][j] = j >= i ? Math.floor(Math.random() * 20) - 10 : 0;
+        }
+      }
+    } else if (matrixType === "Diagonal Dominant") {
+      // Diagonally dominant matrix
+      for (let i = 0; i < matrixSize; i++) {
+        let rowSum = 0;
+        for (let j = 0; j < matrixSize; j++) {
+          if (i !== j) {
+            newMatrix[i][j] = Math.floor(Math.random() * 20) - 10;
+            rowSum += Math.abs(newMatrix[i][j]);
+          }
+        }
+        // Ensure diagonal dominance
+        newMatrix[i][i] = rowSum + Math.floor(Math.random() * 10) + 1;
+      }
+    } else if (matrixType === "Symmetric Positive Definite") {
+      // Symmetric Positive Definite matrix
+      const A = Array(matrixSize)
+        .fill(0)
+        .map(() =>
+          Array(matrixSize)
+            .fill(0)
+            .map(() => Math.floor(Math.random() * 10) + 1)
+        );
+      // Multiply A by its transpose
+      for (let i = 0; i < matrixSize; i++) {
+        for (let j = 0; j <= i; j++) {
+          const value = A[i][j] + A[j][i];
+          newMatrix[i][j] = value;
+          newMatrix[j][i] = value;
+        }
+      }
+    } else if (matrixType === "Band") {
+      // Band matrix
+      for (let i = 0; i < matrixSize; i++) {
+        for (let j = 0; j < matrixSize; j++) {
+          newMatrix[i][j] =
+            Math.abs(i - j) <= bandWidth // Bandwidth condition
+              ? Math.floor(Math.random() * 20) - 10
+              : 0;
+        }
+      }
+    }
+
+    // Random vector b
+    const newVector = Array(matrixSize)
+      .fill(0)
+      .map(() => Math.floor(Math.random() * 20) - 10);
+
+    setMatrix(newMatrix);
+    setVector(newVector);
+    setError(null);
+  };
+  const handleClearMatrix = () => {
+    const newMatrix = Array(matrixSize)
+      .fill(0)
+      .map(() => Array(matrixSize + 1).fill(0));
+    setMatrix(newMatrix);
+    setSolutionMatrix(null);
+    setSteps([]);
+    //setMatrixType(null);
+    setError(null);
+    //
+    //setFileImported(false);
+  };
+  const handleDownloadMatrix = () => {
+    let matrixTypeCode = "";
+
+    // Map the selected matrix type to its code
+    switch (matrixType) {
+      case "Dense":
+        matrixTypeCode = "dense";
+        break;
+      case "Diagonal Dominant":
+        matrixTypeCode = "dd";
+        break;
+      case "Symmetric Positive Definite":
+        matrixTypeCode = "spd";
+        break;
+      case "lower":
+        matrixTypeCode = "lower";
+        break;
+      case "upper":
+        matrixTypeCode = "upper";
+        break;
+      case "Band":
+        matrixTypeCode = "band";
+        break;
+      default:
+        matrixTypeCode = "unknown";
+    }
+
+    // Construct the content of the file
+    let fileContent = matrixTypeCode + "\n"; // First line contains the matrix type code
+
+    // Augment the matrix with the solution vector b
+    matrix.forEach((row, rowIndex) => {
+      const augmentedRow = [...row, vector[rowIndex]]; // Add the corresponding b value
+      fileContent += augmentedRow.join(" ") + "\n"; // Append the augmented row
+    });
+
+    // Create a downloadable file
+    const blob = new Blob([fileContent], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+
+    // Trigger file download
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "augmented_matrix.txt";
+    link.click();
+
+    // Clean up
+    URL.revokeObjectURL(url);
+  };
+
+  const renderMatrix = (matrix: number[][]) => {
+    const matrixString = matrix
+      .map((row) => row.map((value) => value.toString()).join("&"))
+      .join("\\\\");
+    return `\\left(\\begin{matrix}${matrixString}\\end{matrix}\\right)`;
+  };
+
+  const renderVector = (vector: number[]) => {
+    const vectorString = vector.map((value) => value.toString()).join("\\\\");
+    return `\\left(\\begin{matrix}${vectorString}\\end{matrix}\\right)`;
+  };
 
   return (
     <div
       className="container"
       style={{
-        width: "600px",
+        width: "900px",
         fontSize: "24px",
         marginTop: "65px",
-        marginRight: "auto",
         textAlign: "justify",
       }}
     >
-      <h2>Génération aléatoire de la matrice (n)*(n+1)</h2>
+      <h2>Génération aléatoire de la matrice (A) et du vecteur (b)</h2>
       <label>Taille de la matrice: </label>
       <input
         type="number"
@@ -105,12 +247,56 @@ const SystemResolution: React.FC = () => {
         className="form-control mb-3"
         style={{ width: "100px", margin: "0 auto" }}
       />
-
-      <MathJaxContext>
-        <MathJax dynamic>{`\\[ ${renderMatrix()} \\]`}</MathJax>
-      </MathJaxContext>
-
-      {error && <div className="alert alert-danger">{error}</div>}
+      <div className="mb-3">
+        <h5>Choisir le type de matrice</h5>
+        {[
+          { type: "Dense", label: "Dense" },
+          { type: "lower", label: "Triangulaire Inférieure" },
+          { type: "upper", label: "Triangulaire Supérieure" },
+          { type: "Diagonal Dominant", label: "Diagonale Dominante" },
+          {
+            type: "Symmetric Positive Definite",
+            label: "Symétrique Définie Positive",
+          },
+          { type: "Band", label: "Bande" },
+        ].map(({ type, label }, idx) => (
+          <div className="form-check" key={idx}>
+            <input
+              type="radio"
+              className="form-check-input"
+              name="matrixType"
+              id={type}
+              value={type}
+              onChange={() => setMatrixType(type)}
+            />
+            <label className="form-check-label" htmlFor={type}>
+              {label}
+            </label>
+          </div>
+        ))}
+        {matrixType === "Band" && (
+          <div className="mt-3">
+            <label>
+              Largeur de la bande:{" "}
+              <span style={{ color: "grey", fontSize: "16px" }}>
+                <span style={{ marginRight: "3px" }}>
+                  <i className="bx bxs-error"></i>
+                </span>
+                largeur de la bande supérieur = largeur de la bande inférieure
+              </span>{" "}
+            </label>
+            <input
+              type="number"
+              value={bandWidth}
+              onChange={(e) => setBandWidth(parseInt(e.target.value, 10))}
+              className="form-control"
+              style={{ width: "100px", margin: "0 auto" }}
+              min={1}
+              max={matrixSize - 1}
+            />
+          </div>
+        )}
+      </div>
 
       <div className="button-container mt-3">
         <button className="btn btn-danger ms-2" onClick={handleClearMatrix}>
@@ -129,15 +315,42 @@ const SystemResolution: React.FC = () => {
           </span>{" "}
           Générer
         </button>
-        <br />
-        <button
-          style={{ marginTop: "10px", width: "600px", fontSize: "18px" }}
-          className="btn btn-primary"
-          onClick={handleResolution}
-        >
-          Résolution
+        <button className="btn btn-success ms-2" onClick={handleDownloadMatrix}>
+          <span>
+            <i
+              style={{ fontSize: "16px", color: "white", marginRight: "5px" }}
+              className="bx bxs-download"
+            ></i>
+          </span>
+          Télécharger la matrice
         </button>
+        <br />
       </div>
+      <div className="row">
+        <div className="col-md-8">
+          <MathJaxContext>
+            <MathJax dynamic>{`\\[A= ${renderMatrix(matrix)} \\]`}</MathJax>
+          </MathJaxContext>
+        </div>
+        <div className="col-md-4">
+          <MathJaxContext>
+            <MathJax dynamic>{`\\[b= ${renderVector(vector)} \\]`}</MathJax>
+          </MathJaxContext>
+        </div>
+      </div>
+      <button
+        style={{
+          marginLeft: "60px",
+          marginTop: "10px",
+          width: "800px",
+          fontSize: "18px",
+        }}
+        className="btn btn-primary"
+        onClick={handleResolution}
+      >
+        Résolution
+      </button>
+      {error && <div className="alert alert-danger">{error}</div>}
 
       {solutionMatrix && (
         <div>
