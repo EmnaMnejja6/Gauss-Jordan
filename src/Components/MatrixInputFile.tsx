@@ -20,6 +20,7 @@ const MatrixInputFile: React.FC = () => {
     Array(2).fill(Array(3).fill(0))
   );
   const [solutionMatrix, setSolutionMatrix] = useState<number[][] | null>(null);
+  const [solutionVector, setSolutionVector] = useState<number[] | null>(null);
   const [matrixType, setMatrixType] = useState<string | null>(null);
   const [steps, setSteps] = useState<string[]>([]);
   const [showSteps, setShowSteps] = useState<boolean>(true);
@@ -39,13 +40,17 @@ const MatrixInputFile: React.FC = () => {
 
   const handleDownloadSolution = () => {
     if (!solutionMatrix) return;
-    const csvContent = solutionMatrix.map((row) => row.join(",")).join("\n");
+
+    const solutionVector = solutionMatrix.map((row) => row[row.length - 1]);
+
+    const csvContent = solutionVector.join("\n");
+
     const blob = new Blob([csvContent], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
 
     const a = document.createElement("a");
     a.href = url;
-    a.download = "solution.csv";
+    a.download = "solution_vector.csv";
     a.click();
 
     URL.revokeObjectURL(url);
@@ -71,67 +76,54 @@ const MatrixInputFile: React.FC = () => {
 
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const content = event.target?.result as string;
-        const lines = content.split("\n").map((line) => line.trim());
-        const firstLine = lines[0]?.toLowerCase();
-        let matrixType = "";
+    if (!file) return;
 
-        if (["spd", "dd", "upper", "lower", "dense"].includes(firstLine)) {
-          setMatrixType(firstLine);
-          lines.shift();
-        }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target?.result as string;
+      const lines = content.split("\n").map((line) => line.trim());
+      const firstLine = lines[0]?.toLowerCase();
+      let matrixType = "";
 
-        const values = parseFileContent(lines.join("\n"));
+      if (["spd", "dd", "upper", "lower", "dense"].includes(firstLine)) {
+        matrixType = firstLine;
+        lines.shift();
+      }
 
-        const n = Math.floor(Math.sqrt(values.length));
-        if (n * (n + 1) !== values.length) {
-          setError(
-            "Le fichier n'est pas de la forme n*(n+1) ou contient trop peu de valeurs."
-          );
-          return;
-        }
+      const values = parseFileContent(lines.join("\n"));
+      const n = Math.floor(Math.sqrt(values.length));
 
-        const importedMatrix: number[][] = [];
-        for (let i = 0; i < n; i++) {
-          importedMatrix.push(values.slice(i * (n + 1), (i + 1) * (n + 1)));
-          setMatrixSize(n);
-        }
+      if (n * (n + 1) !== values.length) {
+        setError(
+          "Le fichier n'est pas de la forme n*(n+1) ou contient trop peu de valeurs."
+        );
+        return;
+      }
 
-        if (!matrixType) {
-          const isSPD = isSymmetricPositiveDefinite(importedMatrix, matrixSize);
-          const isDiagDom = isDiagonallyDominant(importedMatrix);
-          const isUpper = isUpperTriangular(importedMatrix);
-          const isLower = isLowerTriangular(importedMatrix);
+      const importedMatrix: number[][] = Array(n)
+        .fill(0)
+        .map(() => Array(n + 1).fill(0));
 
-          if (isSPD) {
-            setMatrixType("spd");
-            resolveMatrix(importedMatrix, matrixType);
-          } else if (isDiagDom) {
-            setMatrixType("dd");
-            resolveMatrix(importedMatrix, matrixType);
-          } else if (isUpper) {
-            setMatrixType("upper");
-            resolveMatrix(importedMatrix, matrixType);
-          } else if (isLower) {
-            setMatrixType("lower");
-            resolveMatrix(importedMatrix, matrixType);
-          } else {
-            setMatrixType("dense");
-            resolveMatrix(importedMatrix, "dense");
-            return;
-          }
-        }
+      for (let i = 0; i < n; i++) {
+        importedMatrix[i] = values.slice(i * (n + 1), (i + 1) * (n + 1));
+      }
 
-        setMatrix(importedMatrix);
-        setMatrixSize(n);
-        setError(null);
-      };
+      if (!matrixType) {
+        if (isSymmetricPositiveDefinite(importedMatrix, n)) matrixType = "spd";
+        else if (isDiagonallyDominant(importedMatrix)) matrixType = "dd";
+        else if (isUpperTriangular(importedMatrix)) matrixType = "upper";
+        else if (isLowerTriangular(importedMatrix)) matrixType = "lower";
+        else matrixType = "dense";
+      }
 
-      reader.readAsText(file);
-    }
+      setMatrixType(matrixType);
+      setMatrix(importedMatrix);
+      setMatrixSize(n);
+      resolveMatrix(importedMatrix, matrixType);
+      setError(null);
+    };
+
+    reader.readAsText(file);
   };
 
   const resolveMatrix = (matrix: number[][], type: string) => {
@@ -140,8 +132,10 @@ const MatrixInputFile: React.FC = () => {
       switch (type) {
         case "dense":
           result = gaussJordanWithPivot(matrix);
+          break;
         case "band":
           result = gaussJordanWithPivot(matrix);
+          break;
         case "spd":
           result = resolveSymmetricPositiveDefinite(matrix);
           break;
