@@ -101,8 +101,8 @@ export function isLowerTriangular(mat: number[][]): boolean {
 export function isUpperTriangular(mat: number[][]): boolean {
   return false;
 }
-export function isSymmetric(mat: number[][]): boolean {
-  const n = mat.length;
+export function isSymmetric(mat: number[][], n: number): boolean {
+  //const n = mat.length;
   for (let i = 0; i < n; i++) {
     for (let j = i + 1; j < n; j++) {
       if (mat[i][j] !== mat[j][i]) {
@@ -113,8 +113,8 @@ export function isSymmetric(mat: number[][]): boolean {
   return true;
 }
 
-export function isPositiveDefinite(mat: number[][]): boolean {
-  const n = mat.length;
+export function isPositiveDefinite(mat: number[][], n: number): boolean {
+  //const n = mat.length;
   const L: number[][] = Array.from({ length: n }, () => Array(n).fill(0));
 
   for (let i = 0; i < n; i++) {
@@ -138,8 +138,11 @@ export function isPositiveDefinite(mat: number[][]): boolean {
   }
   return true;
 }
-export function isSymmetricPositiveDefinite(mat: number[][]): boolean {
-  return isSymmetric(mat) && isPositiveDefinite(mat);
+export function isSymmetricPositiveDefinite(
+  mat: number[][],
+  n: number
+): boolean {
+  return isSymmetric(mat, n) && isPositiveDefinite(mat, n);
 }
 export function isInvertible(mat: number[][]): boolean {
   const n = mat.length;
@@ -557,7 +560,8 @@ export function resolveSymmetricPositiveDefinite(matrix: number[][]): {
   matrix: number[][]; // The final reduced matrix
   steps: string[]; // The steps during the calculation
 } {
-  if (!(isSymmetric(matrix) && isPositiveDefinite(matrix))) {
+  const n = matrix.length;
+  if (!isSymmetricPositiveDefinite(matrix, n)) {
     throw new Error("The matrix is not Symmetric definite positive.");
   }
 

@@ -79,7 +79,6 @@ const SystemResolution: React.FC = () => {
       .map(() => Array(matrixSize).fill(0));
 
     if (matrixType === "Dense") {
-      // Full matrix
       newMatrix = Array(matrixSize)
         .fill(0)
         .map(() =>
@@ -88,21 +87,18 @@ const SystemResolution: React.FC = () => {
             .map(() => Math.floor(Math.random() * 20) - 10)
         );
     } else if (matrixType === "lower") {
-      // Lower triangular
       for (let i = 0; i < matrixSize; i++) {
         for (let j = 0; j < matrixSize; j++) {
           newMatrix[i][j] = j <= i ? Math.floor(Math.random() * 20) - 10 : 0;
         }
       }
     } else if (matrixType === "upper") {
-      // Upper triangular
       for (let i = 0; i < matrixSize; i++) {
         for (let j = 0; j < matrixSize; j++) {
           newMatrix[i][j] = j >= i ? Math.floor(Math.random() * 20) - 10 : 0;
         }
       }
     } else if (matrixType === "Diagonal Dominant") {
-      // Diagonally dominant matrix
       for (let i = 0; i < matrixSize; i++) {
         let rowSum = 0;
         for (let j = 0; j < matrixSize; j++) {
@@ -115,7 +111,6 @@ const SystemResolution: React.FC = () => {
         newMatrix[i][i] = rowSum + Math.floor(Math.random() * 10) + 1;
       }
     } else if (matrixType === "Symmetric Positive Definite") {
-      // Symmetric Positive Definite matrix
       const A = Array(matrixSize)
         .fill(0)
         .map(() =>
@@ -125,10 +120,10 @@ const SystemResolution: React.FC = () => {
         );
       // Multiply A by its transpose
       for (let i = 0; i < matrixSize; i++) {
-        for (let j = 0; j <= i; j++) {
-          const value = A[i][j] + A[j][i];
-          newMatrix[i][j] = value;
-          newMatrix[j][i] = value;
+        for (let j = 0; j < matrixSize; j++) {
+          for (let k = 0; k < matrixSize; k++) {
+            newMatrix[i][j] += A[k][i] * A[k][j]; // Symmetric Positive Definite
+          }
         }
       }
     } else if (matrixType === "Band") {

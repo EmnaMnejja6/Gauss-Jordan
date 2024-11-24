@@ -101,7 +101,7 @@ const MatrixInputFile: React.FC = () => {
         }
 
         if (!matrixType) {
-          const isSPD = isSymmetricPositiveDefinite(importedMatrix);
+          const isSPD = isSymmetricPositiveDefinite(importedMatrix, matrixSize);
           const isDiagDom = isDiagonallyDominant(importedMatrix);
           const isUpper = isUpperTriangular(importedMatrix);
           const isLower = isLowerTriangular(importedMatrix);
