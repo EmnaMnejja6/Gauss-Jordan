@@ -6,10 +6,21 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 const Resolution: React.FC = () => {
   const [inputType, setInputType] = useState<String | null>(null);
+  const [matrixSize, setMatrixSize] = useState<number>(2); // Default matrix size
+
+  // Callback function to update matrix size and handle inputType change
+  const handleMatrixSizeChange = (size: number) => {
+    setMatrixSize(size);
+
+    // If size > 10, switch to "file" input method
+    if (size > 10) {
+      setInputType("file");
+    }
+  };
 
   return (
     <div
-      className="container card shadow p-4 mb-5 bg-white rounded "
+      className="container card shadow p-4 mb-5 bg-white rounded"
       style={{
         maxWidth: "1000px",
         marginLeft: "380px",
@@ -57,7 +68,12 @@ const Resolution: React.FC = () => {
         </label>
       </div>
 
-      {inputType === "manual" && <MatrixInputManual />}
+      {inputType === "manual" && (
+        <MatrixInputManual
+          matrixSize={matrixSize}
+          onMatrixSizeChange={handleMatrixSizeChange}
+        />
+      )}
       {inputType === "random" && <MatrixInputRandom />}
       {inputType === "file" && <MatrixInputFile />}
     </div>

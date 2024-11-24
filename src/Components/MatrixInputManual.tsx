@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MathJax, MathJaxContext } from "better-react-mathjax";
 import {
   gaussJordanWithPivot,
@@ -8,9 +8,18 @@ import {
   resolveUpperTriangular,
   resolveLowerTriangular,
 } from "../utils/matrixCalculations";
+import { useNavigate } from "react-router";
 
-const MatrixInputManual: React.FC = () => {
-  const [matrixSize, setMatrixSize] = useState(2);
+interface MatrixInputManualProps {
+  matrixSize: number;
+  onMatrixSizeChange: (size: number) => void;
+}
+const MatrixInputManual: React.FC<MatrixInputManualProps> = ({
+  matrixSize,
+  onMatrixSizeChange,
+}: MatrixInputManualProps) => {
+  const [matrixData, setMatrixData] = useState<number[][]>([]); // Matrix data state
+  //const [matrixSize, setMatrixSize] = useState<number>(2);
   const [matrixType, setMatrixType] = useState("");
   const [bandWidth, setBandWidth] = useState(1);
   const [matrix, setMatrix] = useState(
@@ -22,6 +31,9 @@ const MatrixInputManual: React.FC = () => {
   const [showSteps, setShowSteps] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    setMatrixData([]); // Clear the matrix data
+  }, [matrixType]);
   const handleResolution = () => {
     try {
       const augmentedMatrix = matrix.map((row, index) => [
@@ -61,7 +73,8 @@ const MatrixInputManual: React.FC = () => {
 
   const handleMatrixSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const size = parseInt(e.target.value, 10);
-    setMatrixSize(size);
+
+    onMatrixSizeChange(size);
     setMatrix(
       Array(size)
         .fill(0)
@@ -166,6 +179,18 @@ const MatrixInputManual: React.FC = () => {
     return `\\left(\\begin{matrix}${matrixString}\\end{matrix}\\right)`;
   };
 
+  const handleMatrixTypeChange = (type: string) => {
+    setMatrixType(type);
+    setMatrix(
+      Array(matrixSize)
+        .fill(0)
+        .map(() => Array(matrixSize).fill(0))
+    );
+    setVector(Array(matrixSize).fill(0));
+    setSolutionMatrix(null);
+    setSteps([]);
+    setError(null);
+  };
   const handleDownloadMatrix = () => {
     let matrixTypeCode = "";
 
@@ -241,7 +266,7 @@ const MatrixInputManual: React.FC = () => {
               name="matrixType"
               id={type}
               value={type}
-              onChange={() => setMatrixType(type)}
+              onChange={() => handleMatrixTypeChange(type)}
             />
             <label className="form-check-label" htmlFor={type}>
               {label}
@@ -279,8 +304,6 @@ const MatrixInputManual: React.FC = () => {
         type="number"
         value={matrixSize}
         onChange={handleMatrixSizeChange}
-        min={2}
-        max={10}
         className="form-control mb-3"
         style={{ width: "100px", margin: "0 auto" }}
       />
@@ -402,5 +425,4 @@ const MatrixInputManual: React.FC = () => {
     </div>
   );
 };
-
 export default MatrixInputManual;

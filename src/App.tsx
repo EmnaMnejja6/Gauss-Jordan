@@ -13,6 +13,7 @@ import Cours from "./Components/Course";
 import InverseCalculation from "./Components/InverseCalculation";
 import Resolution from "./Components/Resolution";
 import About from "./Components/about";
+import MatrixInputFile from "./Components/MatrixInputFile";
 ("./Components/About");
 const App: React.FC = () => {
   const location = useLocation();
@@ -32,6 +33,7 @@ const App: React.FC = () => {
         <Route path="/courses" element={<Cours />} />
         <Route path="/resolution" element={<Resolution />} />
         <Route path="/inverse" element={<InverseCalculation />} />
+        <Route path="/matrix-input-file" element={<MatrixInputFile />} />
       </Routes>
     </div>
   );
