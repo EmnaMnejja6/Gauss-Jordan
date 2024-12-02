@@ -67,7 +67,7 @@ const SystemResolution: React.FC = () => {
   };
 
   const handleMatrixSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const size = parseInt(e.target.value, 15);
+    const size = parseInt(e.target.value, 10);
     setMatrixSize(size);
     setMatrix(Array(size).fill(Array(size).fill(0)));
     setVector(Array(size).fill(0));
@@ -225,13 +225,11 @@ const SystemResolution: React.FC = () => {
     <div
       className="container"
       style={{
-        width: "900px",
-        fontSize: "24px",
-        marginTop: "65px",
+        fontSize: "18px",
         textAlign: "justify",
       }}
     >
-      <h2>Génération aléatoire de la matrice (A) et du vecteur (b)</h2>
+      <h4>Génération aléatoire de la matrice (A) et du vecteur (b)</h4>
       <label>Taille de la matrice: </label>
       <input
         type="number"
@@ -244,31 +242,37 @@ const SystemResolution: React.FC = () => {
       />
       <div className="mb-3">
         <h5>Choisir le type de matrice</h5>
-        {[
-          { type: "Dense", label: "Dense" },
-          { type: "lower", label: "Triangulaire Inférieure" },
-          { type: "upper", label: "Triangulaire Supérieure" },
-          { type: "Diagonal Dominant", label: "Diagonale Dominante" },
-          {
-            type: "Symmetric Positive Definite",
-            label: "Symétrique Définie Positive",
-          },
-          { type: "Band", label: "Bande" },
-        ].map(({ type, label }, idx) => (
-          <div className="form-check" key={idx}>
-            <input
-              type="radio"
-              className="form-check-input"
-              name="matrixType"
-              id={type}
-              value={type}
-              onChange={() => setMatrixType(type)}
-            />
-            <label className="form-check-label" htmlFor={type}>
+
+        <div
+          className="btn-group d-flex mb-3"
+          role="group"
+          aria-label="Matrix Type"
+        >
+          {[
+            { type: "Dense", label: "Dense" },
+            { type: "lower", label: "Triangulaire Inférieure" },
+            { type: "upper", label: "Triangulaire Supérieure" },
+            { type: "Diagonal Dominant", label: "Diagonale Dominante" },
+            {
+              type: "Symmetric Positive Definite",
+              label: "Symétrique Définie Positive",
+            },
+            { type: "Band", label: "Bande" },
+          ].map(({ type, label }, idx) => (
+            <button
+              key={idx}
+              type="button"
+              className={`btn ${
+                matrixType === type ? "btn-dark" : "btn-outline-dark"
+              }`}
+              style={{ flex: 1 }}
+              onClick={() => setMatrixType(type)}
+            >
               {label}
-            </label>
-          </div>
-        ))}
+            </button>
+          ))}
+        </div>
+
         {matrixType === "Band" && (
           <div className="mt-3">
             <label>

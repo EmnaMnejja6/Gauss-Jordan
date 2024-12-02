@@ -124,7 +124,7 @@ const InverseCalculation = () => {
         <tbody>
           {matrix.map((row, rowIndex) => (
             <tr key={rowIndex}>
-              {row.map((value, colIndex) => (
+              {row.map((colIndex) => (
                 <td key={colIndex}>
                   <input
                     type="number"

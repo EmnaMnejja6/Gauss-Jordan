@@ -1,11 +1,4 @@
 import React from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Navbar from "./Components/navbar";
 import Home from "./Components/Home";
@@ -14,6 +7,9 @@ import InverseCalculation from "./Components/InverseCalculation";
 import Resolution from "./Components/Resolution";
 import About from "./Components/about";
 import MatrixInputFile from "./Components/MatrixInputFile";
+import Login from "./Components/Login";
+import Signup from "./Components/Signup";
+import { Route, Routes, useLocation } from "react-router-dom";
 ("./Components/About");
 const App: React.FC = () => {
   const location = useLocation();
@@ -34,6 +30,8 @@ const App: React.FC = () => {
         <Route path="/resolution" element={<Resolution />} />
         <Route path="/inverse" element={<InverseCalculation />} />
         <Route path="/matrix-input-file" element={<MatrixInputFile />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
       </Routes>
     </div>
   );

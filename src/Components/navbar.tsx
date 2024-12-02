@@ -13,26 +13,41 @@ const Navbar: React.FC = () => {
             onClick={() => navigate("/")}
             style={{ cursor: "pointer" }}
           >
+            <span style={{ margin: "3px" }}>
+              <i className="bx bxs-home"></i>
+            </span>
             Acceuil
           </a>
         </li>
         <li className="nav-item">
           <NavLink to="/about" className="nav-link">
+          <span style={{ margin: "3px" }}>
+              <i className="bx bxs-info-circle"></i>
+            </span>
             A propos
           </NavLink>
         </li>
         <li className="nav-item">
           <NavLink to="/courses" className="nav-link">
+          <span style={{ margin: "3px" }}>
+              <i className="bx bxs-book"></i>
+            </span>
             Cours
           </NavLink>
         </li>
         <li className="nav-item">
           <NavLink to="/resolution" className="nav-link">
+            <span style={{ margin: "3px" }}>
+              <i className="bx bxs-calculator"></i>
+            </span>
             Résolution
           </NavLink>
         </li>
         <li className="nav-item">
           <NavLink to="/inverse" className="nav-link">
+          <span style={{ margin: "3px" }}>
+              <i className="bx bx-math"></i>
+            </span>
             Inverse
           </NavLink>
         </li>

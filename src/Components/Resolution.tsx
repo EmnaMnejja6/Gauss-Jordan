@@ -19,6 +19,7 @@ const Resolution: React.FC = () => {
   };
 
   return (
+    <div>
     <div
       className="container card shadow p-4 mb-5 bg-white rounded"
       style={{
@@ -28,44 +29,32 @@ const Resolution: React.FC = () => {
         fontSize: "18px",
       }}
     >
-      <h2 className="text-center mb-4">Choisir le type de saisie</h2>
-      <p className="text-muted text-center mb-4">
-        Veuillez sélectionner le mode de saisie de la matrice.
-      </p>
-      <div className="form-check mb-3">
-        <input
-          type="radio"
-          className="form-check-input"
-          name="inputType"
-          value="manual"
-          onChange={() => setInputType("manual")}
-          checked={inputType === "manual"}
-        />
-        <label className="form-check-label ms-2">Saisie Manuelle</label>
-      </div>
-      <div className="form-check mb-3">
-        <input
-          type="radio"
-          className="form-check-input"
-          name="inputType"
-          value="random"
-          onChange={() => setInputType("random")}
-          checked={inputType === "random"}
-        />
-        <label className="form-check-label ms-2">Aléatoire</label>
-      </div>
-      <div className="form-check mb-4">
-        <input
-          type="radio"
-          className="form-check-input"
-          name="inputType"
-          value="file"
-          onChange={() => setInputType("file")}
-          checked={inputType === "file"}
-        />
-        <label className="form-check-label ms-2">
-          Importer à partir d'un fichier
-        </label>
+      <h3 className="text-center mb-4">Choisir le type de saisie</h3>
+      
+      <div
+        className="btn-group d-flex mb-4"
+        role="group"
+        aria-label="Input Type"
+      >
+        {[
+          { value: "manual", label: "Saisie Manuelle" },
+          { value: "random", label: "Aléatoire" },
+          { value: "file", label: "Importer à partir d'un fichier" },
+        ].map(({ value, label }) => (
+          <button
+            key={value}
+            type="button"
+            className={`btn ${
+              inputType === value ? "btn-primary" : "btn-outline-primary"
+            }`}
+            style={{
+              flex: 1,
+            }}
+            onClick={() => setInputType(value)}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
       {inputType === "manual" && (
@@ -76,6 +65,7 @@ const Resolution: React.FC = () => {
       )}
       {inputType === "random" && <MatrixInputRandom />}
       {inputType === "file" && <MatrixInputFile />}
+    </div>
     </div>
   );
 };

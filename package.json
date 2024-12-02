@@ -11,8 +11,10 @@
     "test": "jest"
   },
   "dependencies": {
+    "@firebasegen/default-connector": "file:dataconnect-generated/js/default-connector",
     "better-react-mathjax": "^2.0.3",
     "bootstrap": "^5.3.3",
+    "firebase": "^11.0.2",
     "mathjax-full": "^3.2.2",
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.5",

@@ -3,7 +3,6 @@ import { MathJax, MathJaxContext } from "better-react-mathjax";
 import {
   gaussJordanWithPivot,
   resolveDiagonalDominant,
-  resolveBand,
   resolveSymmetricPositiveDefinite,
   resolveUpperTriangular,
   resolveLowerTriangular,
@@ -11,16 +10,12 @@ import {
   isUpperTriangular,
   isLowerTriangular,
   isDiagonallyDominant,
-  gaussJordanBanded,
 } from "../utils/matrixCalculations";
 
 const MatrixInputFile: React.FC = () => {
   const [matrixSize, setMatrixSize] = useState<number>(2);
-  const [matrix, setMatrix] = useState<number[][]>(
-    Array(2).fill(Array(3).fill(0))
-  );
+  const [, setMatrix] = useState<number[][]>(Array(2).fill(Array(3).fill(0)));
   const [solutionMatrix, setSolutionMatrix] = useState<number[][] | null>(null);
-  const [solutionVector, setSolutionVector] = useState<number[] | null>(null);
   const [matrixType, setMatrixType] = useState<string | null>(null);
   const [steps, setSteps] = useState<string[]>([]);
   const [showSteps, setShowSteps] = useState<boolean>(true);
@@ -59,6 +54,9 @@ const MatrixInputFile: React.FC = () => {
   {
     solutionMatrix && matrixSize > 10 && (
       <button className="btn btn-primary mt-3" onClick={handleDownloadSolution}>
+        <span>
+          <i style={{ color: "white" }} className="bx bxs-download"></i>
+        </span>
         Télécharger solution
       </button>
     );
@@ -169,7 +167,7 @@ const MatrixInputFile: React.FC = () => {
   return (
     <div
       className="container"
-      style={{ width: "600px", fontSize: "24px", marginTop: "65px" }}
+      style={{ width: "600px", fontSize: "18px", marginTop: "65px" }}
     >
       <label>Taille de la matrice: </label>
       <input

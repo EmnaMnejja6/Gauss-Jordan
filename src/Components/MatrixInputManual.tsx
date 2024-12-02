@@ -8,7 +8,6 @@ import {
   resolveUpperTriangular,
   resolveLowerTriangular,
 } from "../utils/matrixCalculations";
-import { useNavigate } from "react-router";
 
 interface MatrixInputManualProps {
   matrixSize: number;
@@ -18,7 +17,7 @@ const MatrixInputManual: React.FC<MatrixInputManualProps> = ({
   matrixSize,
   onMatrixSizeChange,
 }: MatrixInputManualProps) => {
-  const [matrixData, setMatrixData] = useState<number[][]>([]); // Matrix data state
+  const [, setMatrixData] = useState<number[][]>([]); // Matrix data state
   //const [matrixSize, setMatrixSize] = useState<number>(2);
   const [matrixType, setMatrixType] = useState("");
   const [bandWidth, setBandWidth] = useState(1);
@@ -29,10 +28,10 @@ const MatrixInputManual: React.FC<MatrixInputManualProps> = ({
   const [solutionMatrix, setSolutionMatrix] = useState<number[][] | null>(null);
   const [steps, setSteps] = useState<string[]>([]);
   const [showSteps, setShowSteps] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setMatrixData([]); // Clear the matrix data
+    setMatrixData([]);
   }, [matrixType]);
   const handleResolution = () => {
     try {
@@ -94,7 +93,6 @@ const MatrixInputManual: React.FC<MatrixInputManualProps> = ({
       row.map((val, cIdx) => {
         if (rIdx === rowIndex && cIdx === colIndex) return value;
 
-        // Ensure symmetry for symmetric positive definite matrices
         if (
           matrixType === "Symmetric Positive Definite" &&
           rIdx < cIdx &&
@@ -108,7 +106,6 @@ const MatrixInputManual: React.FC<MatrixInputManualProps> = ({
       })
     );
 
-    // Ensure symmetry for symmetric positive definite matrices
     if (matrixType === "Symmetric Positive Definite") {
       updatedMatrix[colIndex][rowIndex] = value;
     }
@@ -242,37 +239,35 @@ const MatrixInputManual: React.FC<MatrixInputManualProps> = ({
   };
 
   return (
-    <div
-      className="container"
-      style={{ width: "800px", fontSize: "24px", marginTop: "10px" }}
-    >
+    <div className="container">
+      {/*choisir le type de matrice */}
       <div className="mb-3">
-        <h5>Choisir le type de matrice</h5>
-        {[
-          { type: "Dense", label: "Dense" },
-          { type: "Diagonal Dominant", label: "Diagonale Dominante" },
-          { type: "lower", label: "Triangulaire Inférieure" },
-          { type: "upper", label: "Triangulaire Supérieure" },
-          {
-            type: "Symmetric Positive Definite",
-            label: "Symétrique Définie Positive",
-          },
-          { type: "Band", label: "Bande" },
-        ].map(({ type, label }, idx) => (
-          <div className="form-check" key={idx}>
-            <input
-              type="radio"
-              className="form-check-input"
-              name="matrixType"
-              id={type}
-              value={type}
-              onChange={() => handleMatrixTypeChange(type)}
-            />
-            <label className="form-check-label" htmlFor={type}>
+        <h4>Choisir le type de matrice</h4>
+        <div className="btn-group" role="group">
+          {[
+            { type: "Dense", label: "Dense" },
+            { type: "Diagonal Dominant", label: "Diagonale Dominante" },
+            { type: "lower", label: "Triangulaire Inférieure" },
+            { type: "upper", label: "Triangulaire Supérieure" },
+            {
+              type: "Symmetric Positive Definite",
+              label: "Symétrique Définie Positive",
+            },
+            { type: "Band", label: "Bande" },
+          ].map(({ type, label }, idx) => (
+            <button
+              key={idx}
+              type="button"
+              className={`btn ${
+                matrixType === type ? "btn-dark" : "btn-outline-dark"
+              }`}
+              onClick={() => handleMatrixTypeChange(type)}
+            >
               {label}
-            </label>
-          </div>
-        ))}
+            </button>
+          ))}
+        </div>
+
         {matrixType === "Band" && (
           <div className="mt-3">
             <label>
@@ -298,11 +293,12 @@ const MatrixInputManual: React.FC<MatrixInputManualProps> = ({
         )}
       </div>
 
-      <h2>Saisie de la matrice A et du vecteur b</h2>
+      <h4>Saisie de la matrice A et du vecteur b</h4>
       <label>Taille de la matrice: </label>
       <input
         type="number"
         value={matrixSize}
+        min={2}
         onChange={handleMatrixSizeChange}
         className="form-control mb-3"
         style={{ width: "100px", margin: "0 auto" }}

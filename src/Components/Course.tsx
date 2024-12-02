@@ -1,4 +1,3 @@
-import React from "react";
 import { MathJax, MathJaxContext } from "better-react-mathjax";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { coy } from "react-syntax-highlighter/dist/esm/styles/prism";

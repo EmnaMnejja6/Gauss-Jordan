@@ -2,6 +2,7 @@
   /*This File that contains all the functions and algorithms*/
 }
 function isBand(mat: number[][], k: number): boolean {
+  console.log(k);
   let n = mat.length;
   let k1 = 0,
     k2 = 0;
@@ -96,9 +97,11 @@ export function gaussJordanBanded(
 }
 */
 export function isLowerTriangular(mat: number[][]): boolean {
+  console.log(mat);
   return false;
 }
 export function isUpperTriangular(mat: number[][]): boolean {
+  console.log(mat);
   return false;
 }
 export function isSymmetric(mat: number[][], n: number): boolean {
@@ -547,8 +550,6 @@ export function resolveDiagonalDominant(matrix: number[][]): {
   matrix: number[][]; // The final reduced matrix
   steps: string[]; // The steps during the calculation
 } {
-  const isDominant = isDiagonallyDominant(matrix);
-
   if (!isDiagonallyDominant(matrix)) {
     throw new Error("The matrix is not diagonally dominant.");
   }
