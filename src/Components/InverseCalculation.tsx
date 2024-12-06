@@ -5,7 +5,6 @@ import { inverseMatrix } from "../utils/matrixCalculations";
 const InverseCalculation = () => {
   const [matrixSize, setMatrixSize] = useState<number>(2);
   const [matrix, setMatrix] = useState<number[][]>(
-     Array.from({ length: 2 }, () => Array(2).fill(0))
     Array.from({ length: 2 }, () => Array(2).fill(0))
   );
   const [solutionMatrix, setSolutionMatrix] = useState<number[][] | null>(null);
@@ -15,7 +14,6 @@ const InverseCalculation = () => {
     const size = parseInt(e.target.value, 10);
     const newMatrix = Array(size)
       .fill(0)
-      .map(() => Array(size).fill(0)); 
       .map(() => Array(size).fill(0));
     setMatrixSize(size);
     setMatrix(newMatrix);
@@ -37,7 +35,6 @@ const InverseCalculation = () => {
   };
 
   const handleClearMatrix = () => {
-    setMatrixSize(2);
     setMatrixSize(2);
     const newMatrix = Array(matrixSize)
       .fill(0)
@@ -130,12 +127,8 @@ const InverseCalculation = () => {
             <tr key={`row-${rowIndex}`}>
               {row.map((colValue, colIndex) => (
                 <td key={`cell-${rowIndex}-${colIndex}`}>
-            <tr key={`row-${rowIndex}`}>
-              {row.map((colValue, colIndex) => (
-                <td key={`cell-${rowIndex}-${colIndex}`}>
                   <input
                     type="number"
-                    value={colValue}
                     value={colValue}
                     onChange={(e) => handleMatrixChange(e, rowIndex, colIndex)}
                     style={{
