@@ -29,137 +29,10 @@ function isBand(mat: number[][], k: number): boolean {
   k = k1;
   return true;
 }
-/*
-export function gaussJordanBanded(
-  matrix: number[][],
-  k: number
-): {
-  matrix: number[][];
-  steps: string[];
-} {
-  const steps: string[] = [];
-  const n = matrix.length;
 
-  for (let i = 0; i < n; i++) {
-    // Step 1: Find the pivot in the banded area (only within the `k` bandwidth)
-    let pivot = matrix[i][i];
-    if (Math.abs(pivot) < 1e-10) {
-      steps.push(
-        `\\text{Le pivot à la position (${i + 1}, ${
-          i + 1
-        }) est nul. Résolution impossible avec ce pivot.}`
-      );
-      throw new Error(`Pivot nul détecté à la position (${i + 1}, ${i + 1})`);
-    }
-
-    steps.push(
-      `\\text{Normalisation de la ligne ${
-        i + 1
-      } en divisant par le pivot } ${pivot}.`
-    );
-    console.log(`Normalisation de la ligne ${i + 1} avec le pivot ${pivot}`);
-
-    // Step 2: Normalize the pivot row
-    for (let j = i; j < Math.min(i + k + 1, n + 1); j++) {
-      matrix[i][j] /= pivot;
-    }
-
-    steps.push(
-      `\\left(\\begin{matrix} ${formatAugmentedMatrix(
-        matrix
-      )} \\end{matrix}\\right)`
-    );
-
-    // Step 3: Eliminate the current column in all other rows within the band
-    for (let row = 0; row < n; row++) {
-      if (row !== i) {
-        const multiplier = matrix[row][i];
-        steps.push(
-          `\\text{Opération sur la ligne } r_{${row + 1}} - (${toFraction(
-            multiplier
-          )}) r_{${i + 1}}`
-        );
-
-        for (let col = i; col < Math.min(i + k + 1, n + 1); col++) {
-          matrix[row][col] -= multiplier * matrix[i][col];
-        }
-
-        steps.push(
-          `\\left(\\begin{matrix} ${formatAugmentedMatrix(
-            matrix
-          )} \\end{matrix}\\right)`
-        );
-      }
-    }
-  }
-
-  return { matrix, steps };
-}
-*/
-export function isLowerTriangular(matrix: number[][]): {
-  matrix: number[][];
-  steps: string[];
-} {
-  const steps: string[] = [];
-  const n = matrix.length;
-
-  for (let k = 0; k < n; k++) {
-    // Normalize row k
-    const pivot = matrix[k][k];
-    if (pivot === 0) {
-      steps.push(`\\text{Pivot est zero ${k + 1}, matrice is singuliere.}`);
-      return { matrix, steps };
-    }
-
-    // Normalize the pivot row
-    for (let j = k; j < n + 1; j++) {
-      matrix[k][j] /= pivot;
-    }
-
-    // Log after normalization
-    steps.push(`\\text{ Normalisation de } r_${k + 1}`);
-    steps.push(
-      `\\left(\\begin{matrix} ${formatAugmentedMatrix(
-        matrix
-      )} \\end{matrix}\\right)`
-    );
-
-    for (let i = 0; i < k; i++) {
-      const multiplier = matrix[i][k];
-      for (let j = k; j < n + 1; j++) {
-        matrix[i][j] -= multiplier * matrix[k][j];
-      }
-
-      // Log after each row operation
-      steps.push(`\\ r_${i + 1} - (${toFraction(multiplier)}) r${k + 1}`);
-      steps.push(
-        `\\left(\\begin{matrix} ${formatAugmentedMatrix(
-          matrix
-        )} \\end{matrix}\\right)`
-      );
-    }
-
-    for (let i = k + 1; i < n; i++) {
-      const multiplier = matrix[i][k];
-      for (let j = k; j < n + 1; j++) {
-        matrix[i][j] -= multiplier * matrix[k][j];
-      }
-
-      // Log after each row operation
-      steps.push(
-        `\\text{Row operation } r_${i + 1} - (${toFraction(multiplier)}) r_${
-          k + 1
-        }`
-      );
-      steps.push(
-        `\\left(\\begin{matrix} ${formatAugmentedMatrix(
-          matrix
-        )} \\end{matrix}\\right)`
-      );
-    }
-  }
-
-  return { matrix, steps };
+export function isLowerTriangular(mat: number[][]): boolean {
+  console.log(mat);
+  return false;
 }
 export function isUpperTriangular(mat: number[][]): boolean {
   console.log(mat);
@@ -178,7 +51,6 @@ export function isSymmetric(mat: number[][], n: number): boolean {
 }
 
 export function isPositiveDefinite(mat: number[][], n: number): boolean {
-  //const n = mat.length;
   const L: number[][] = Array.from({ length: n }, () => Array(n).fill(0));
 
   for (let i = 0; i < n; i++) {
@@ -235,20 +107,18 @@ export function isDiagonallyDominant(matrix: number[][]): boolean {
     let diagonalElement = Math.abs(matrix[i][i]);
     let sumOfOffDiagonal = 0;
 
-    // Sum all non-diagonal elements in the row
     for (let j = 0; j < n; j++) {
       if (i !== j) {
         sumOfOffDiagonal += Math.abs(matrix[i][j]);
       }
     }
 
-    // Check if the diagonal element is greater than or equal to the sum of off-diagonal elements
     if (diagonalElement < sumOfOffDiagonal) {
-      return false; // The matrix is not diagonally dominant
+      return false;
     }
   }
 
-  return true; // The matrix is diagonally dominant
+  return true;
 }
 
 export function augmentMatrix(mat: number[][]): number[][] {
@@ -275,7 +145,6 @@ export function gaussJordanBanded(
     let maxVal = Math.abs(matrix[pivot][pivot]);
     let iPivot = pivot;
 
-    // Recherche du pivot maximal dans la bande
     for (let i = pivot + 1; i <= pivot + k && i < n; i++) {
       if (Math.abs(matrix[i][pivot]) > maxVal) {
         maxVal = Math.abs(matrix[i][pivot]);
@@ -283,97 +152,76 @@ export function gaussJordanBanded(
       }
     }
 
-    // Échange de lignes si nécessaire
     if (iPivot !== pivot) {
-      for (let j = 0; j < n + 1; j++) {
-        const aux = matrix[pivot][j];
-        matrix[pivot][j] = matrix[iPivot][j];
-        matrix[iPivot][j] = aux;
+      [matrix[pivot], matrix[iPivot]] = [matrix[iPivot], matrix[pivot]];
+      steps.push(`\\text{Échange des lignes ${pivot + 1} et ${iPivot + 1}}:`);
+      steps.push(
+        `\\left(\\begin{matrix} ${formatAugmentedMatrix(
+          matrix
+        )} \\end{matrix}\\right)`
+      );
+    }
+
+    const pivotValue = matrix[pivot][pivot];
+    if (pivotValue == 0) {
+      alert("La Matrice est singulière");
+      throw new Error("Matrice singulière.");
+    }
+    for (let j = pivot; j < n + 1; j++) {
+      matrix[pivot][j] /= pivotValue;
+      operationsCount++;
+    }
+    if (pivot != 1) {
+      steps.push(`\\text{Normalisation de la ligne ${pivot + 1}}:`);
+      steps.push(
+        `\\left(\\begin{matrix} ${formatAugmentedMatrix(
+          matrix
+        )} \\end{matrix}\\right)`
+      );
+    }
+
+    for (let i = 0; i < pivot; i++) {
+      const f = matrix[i][pivot];
+      for (let j = pivot; j < n + 1; j++) {
+        matrix[i][j] -= f * matrix[pivot][j];
+        operationsCount++;
       }
-      steps.push(`\\text{Échange des lignes ${pivot + 1} et ${iPivot + 1}}`);
-    }
-
-    // Normalisation de la ligne de pivot
-    for (let j = pivot + 1; j < n + 1; j++) {
-      matrix[pivot][j] /= matrix[pivot][pivot];
-      operationsCount += 1;
-    }
-
-    // Élimination des autres lignes en haut de la bande
-    for (let i = pivot - k; i < pivot && i >= 0; i++) {
-      for (let j = pivot + 1; j < n + 1; j++) {
-        matrix[i][j] -= matrix[i][pivot] * matrix[pivot][j];
-        operationsCount += 2;
+      if (f != 0) {
+        steps.push(
+          `\\text{L ${i + 1} = L ${i + 1} - (${f}) * L ${pivot + 1}}:`
+        );
+        steps.push(
+          `\\left(\\begin{matrix} ${formatAugmentedMatrix(
+            matrix
+          )} \\end{matrix}\\right)`
+        );
       }
     }
 
-    // Élimination des autres lignes en bas de la bande
-    for (let i = pivot + 1; i <= pivot + k && i < n; i++) {
-      for (let j = pivot + 1; j < n + 1; j++) {
-        matrix[i][j] -= matrix[i][pivot] * matrix[pivot][j];
-        operationsCount += 2;
+    for (let i = pivot + 1; i < n; i++) {
+      const f = matrix[i][pivot];
+      for (let j = pivot; j < n + 1; j++) {
+        matrix[i][j] -= f * matrix[pivot][j];
+        operationsCount++;
+      }
+      if (f != 0) {
+        steps.push(
+          `\\text{L ${i + 1} = L ${i + 1} - (${f}) * L ${pivot + 1}}:`
+        );
+        steps.push(
+          `\\left(\\begin{matrix} ${formatAugmentedMatrix(
+            matrix
+          )} \\end{matrix}\\right)`
+        );
       }
     }
-
-    steps.push(
-      `\\left(\\begin{matrix} ${formatAugmentedMatrix(
-        matrix
-      )} \\end{matrix}\\right)`
-    );
   }
 
   steps.push(
     `\\text{Nombre total d'opérations arithmétiques : ${operationsCount}}`
   );
-  steps.push(
-    `\\left(\\begin{matrix} ${formatAugmentedMatrix(
-      matrix
-    )} \\end{matrix}\\right)`
-  );
 
-  steps.push(
-    `\\text{Nombre total d'opérations arithmétiques : ${operationsCount}}`
-  );
   return { matrix, steps };
-}
-
-export function invertMatrix(mat: number[][]): number[][] | null {
-  const n = mat.length;
-  let augmentedMatrix = augmentMatrix(mat);
-
-  // Check if the matrix is invertible
-  if (!isInvertible(augmentedMatrix)) {
-    return null;
-  }
-
-  for (let k = 0; k < n; k++) {
-    let diag = augmentedMatrix[k][k];
-
-    // Normalize the pivot row
-    for (let j = 0; j < 2 * n; j++) {
-      augmentedMatrix[k][j] /= diag;
-    }
-
-    // Eliminate other rows above the pivot
-    for (let i = 0; i < k; i++) {
-      const factor = augmentedMatrix[i][k];
-      for (let j = 0; j < 2 * n; j++) {
-        augmentedMatrix[i][j] -= factor * augmentedMatrix[k][j];
-      }
-    }
-
-    // Eliminate other rows below the pivot
-    for (let i = k + 1; i < n; i++) {
-      const factor = augmentedMatrix[i][k];
-      for (let j = 0; j < 2 * n; j++) {
-        augmentedMatrix[i][j] -= factor * augmentedMatrix[k][j];
-      }
-    }
-  }
-
-  // Extract the inverse matrix from the augmented matrix
-  const inverseMatrix = augmentedMatrix.map((row) => row.slice(n));
-  return inverseMatrix;
 }
 
 export function gaussJordanWithoutPivot(matrix: number[][]): {
@@ -382,21 +230,20 @@ export function gaussJordanWithoutPivot(matrix: number[][]): {
 } {
   const steps: string[] = [];
   const n = matrix.length;
+  let operations = 0;
 
   for (let k = 0; k < n; k++) {
-    // Normalize row k
     const pivot = matrix[k][k];
     if (pivot === 0) {
       steps.push(`\\text{Pivot est zero ${k + 1}, matrice is singuliere.}`);
       return { matrix, steps };
     }
 
-    // Normalize the pivot row
     for (let j = k; j < n + 1; j++) {
       matrix[k][j] /= pivot;
+      operations++;
     }
 
-    // Log after normalization
     steps.push(`\\text{ Normalisation de } r_${k + 1}`);
     steps.push(
       `\\left(\\begin{matrix} ${formatAugmentedMatrix(
@@ -405,13 +252,17 @@ export function gaussJordanWithoutPivot(matrix: number[][]): {
     );
 
     for (let i = 0; i < k; i++) {
-      const multiplier = matrix[i][k];
+      const m = matrix[i][k];
       for (let j = k; j < n + 1; j++) {
-        matrix[i][j] -= multiplier * matrix[k][j];
+        matrix[i][j] -= m * matrix[k][j];
+        operations += 2;
       }
 
-      // Log after each row operation
-      steps.push(`\\ r_${i + 1} - (${toFraction(multiplier)}) r${k + 1}`);
+      steps.push(
+        `r_{${i + 1}} \\leftarrow r_{${i + 1}} - (${toFraction(m)}) r_{${
+          k + 1
+        }}`
+      );
       steps.push(
         `\\left(\\begin{matrix} ${formatAugmentedMatrix(
           matrix
@@ -420,17 +271,18 @@ export function gaussJordanWithoutPivot(matrix: number[][]): {
     }
 
     for (let i = k + 1; i < n; i++) {
-      const multiplier = matrix[i][k];
+      const m = matrix[i][k];
       for (let j = k; j < n + 1; j++) {
-        matrix[i][j] -= multiplier * matrix[k][j];
+        matrix[i][j] -= m * matrix[k][j];
+        operations += 2;
       }
 
-      // Log after each row operation
       steps.push(
-        `\\text{Row operation } r_${i + 1} - (${toFraction(multiplier)}) r_${
+        `r_{${i + 1}} \\leftarrow r_{${i + 1}} - (${toFraction(m)}) r_{${
           k + 1
-        }`
+        }}`
       );
+
       steps.push(
         `\\left(\\begin{matrix} ${formatAugmentedMatrix(
           matrix
@@ -438,6 +290,7 @@ export function gaussJordanWithoutPivot(matrix: number[][]): {
       );
     }
   }
+  steps.push(`\\text{Nombre total d'opérations : ${operations}.}`);
 
   return { matrix, steps };
 }
@@ -448,6 +301,7 @@ export function gaussJordanWithPivot(matrix: number[][]): {
 } {
   const steps: string[] = [];
   const n = matrix.length;
+  let operations = 0;
 
   for (let k = 0; k < n; k++) {
     let max = Math.abs(matrix[k][k]);
@@ -466,7 +320,11 @@ export function gaussJordanWithPivot(matrix: number[][]): {
     if (iPivot !== k) {
       [matrix[k], matrix[iPivot]] = [matrix[iPivot], matrix[k]];
       steps.push(`\\text{Permuter la ligne ${k + 1} avec ${iPivot + 1}}`);
-      console.log(`Permutation des lignes ${k + 1} et ${iPivot + 1}`);
+      steps.push(
+        `\\left(\\begin{matrix} ${formatAugmentedMatrix(
+          matrix
+        )} \\end{matrix}\\right)`
+      );
     }
 
     const pivot = matrix[k][k];
@@ -488,58 +346,86 @@ export function gaussJordanWithPivot(matrix: number[][]): {
     );
     for (let j = k; j < n + 1; j++) {
       matrix[k][j] /= pivot;
+      operations++;
     }
 
-    steps.push(`${formatAugmentedMatrix(matrix)}`);
+    steps.push(
+      `\\left(\\begin{matrix} ${formatAugmentedMatrix(
+        matrix
+      )} \\end{matrix}\\right)`
+    );
     console.log(`Matrice après normalisation de la ligne ${k + 1}:`, matrix);
 
-    // Opérations sur les lignes ci-dessous
     for (let i = 0; i < k; i++) {
-      const multiplier = matrix[i][k];
+      const m = matrix[i][k];
       for (let j = k; j < n + 1; j++) {
-        matrix[i][j] -= multiplier * matrix[k][j];
+        matrix[i][j] -= m * matrix[k][j];
+        operations += 2;
       }
 
-      // Log after each row operation
-      steps.push(`r_${i + 1} - (${toFraction(multiplier)}) r_${k + 1}`);
-      steps.push(`${formatAugmentedMatrix(matrix)}`);
+      if (m != 0) {
+        steps.push(
+          `r_{${i + 1}} \\leftarrow r_{${i + 1}} - (${toFraction(m)}) r_{${
+            k + 1
+          }}`
+        );
+        steps.push(
+          `\\left(\\begin{matrix} ${formatAugmentedMatrix(
+            matrix
+          )} \\end{matrix}\\right)`
+        );
+      }
     }
 
     for (let i = k + 1; i < n; i++) {
-      const multiplier = matrix[i][k];
+      const m = matrix[i][k];
       for (let j = k; j < n + 1; j++) {
-        matrix[i][j] -= multiplier * matrix[k][j];
+        matrix[i][j] -= m * matrix[k][j];
+        operations += 2;
       }
 
-      steps.push(`r_${i + 1} - (${toFraction(multiplier)}) r_${k + 1}`);
-      steps.push(`${formatAugmentedMatrix(matrix)}`);
+      if (m != 0) {
+        steps.push(
+          `r_{${i + 1}} \\leftarrow r_{${i + 1}} - (${toFraction(m)}) r_{${
+            k + 1
+          }}`
+        );
+        steps.push(
+          `\\left(\\begin{matrix} ${formatAugmentedMatrix(
+            matrix
+          )} \\end{matrix}\\right)`
+        );
+      }
     }
   }
-
+  steps.push(`\\text{Nombre total d'opérations : ${operations}.}`);
   return { matrix, steps };
 }
 
 export function inverseMatrix(mat: number[][]): {
   matrix: number[][]; // La matrice finale après réduction
   steps: string[]; // Les étapes pendant le calcul
+  operations: number;
 } {
   const steps: string[] = [];
   const n = mat.length;
+  let operations = 0;
 
-  // Créer une copie profonde de la matrice pour l'opération
   const augmentedMatrix = mat.map((row) => [...row, ...Array(n).fill(0)]);
   for (let i = 0; i < n; i++) {
     augmentedMatrix[i][i + n] = 1;
   }
 
-  // Afficher la matrice augmentée initiale
   steps.push("Matrice augmentée initiale :");
-  steps.push(formatAugmentedMatrix(augmentedMatrix));
+  steps.push(
+    `\\left(\\begin{matrix} ${formatAugmentedMatrix(
+      augmentedMatrix
+    )} \\end{matrix}\\right)`
+  );
 
   let diag: number;
   let permute: boolean;
 
-  // Gauss-Jordan Elimination
   for (let k = 0; k < n; k++) {
     diag = augmentedMatrix[k][k];
     if (diag === 0) {
@@ -552,7 +438,11 @@ export function inverseMatrix(mat: number[][]): {
           ];
           permute = true;
           steps.push(`Permutation des lignes ${k + 1} et ${i + 1}`);
-          steps.push(formatAugmentedMatrix(augmentedMatrix));
+          steps.push(
+            `\\left(\\begin{matrix} ${formatAugmentedMatrix(
+              augmentedMatrix
+            )} \\end{matrix}\\right)`
+          );
           break;
         }
       }
@@ -563,48 +453,62 @@ export function inverseMatrix(mat: number[][]): {
           "La matrice est singulière et ne peut pas être inversée."
         );
       }
-      diag = augmentedMatrix[k][k]; // Mettre à jour la diagonale après permutation
+      diag = augmentedMatrix[k][k];
     }
 
-    // Normalisation de la ligne
     for (let j = 0; j < 2 * n; j++) {
       augmentedMatrix[k][j] /= diag;
+      operations++;
     }
     steps.push(`Normalisation de la ligne ${k + 1}`);
-    steps.push(formatAugmentedMatrix(augmentedMatrix));
-
-    // Élimination des éléments au-dessus de la diagonale
+    steps.push(
+      `\\left(\\begin{matrix} ${formatAugmentedMatrix(
+        augmentedMatrix
+      )} \\end{matrix}\\right)`
+    );
     for (let i = 0; i < k; i++) {
-      const factor = augmentedMatrix[i][k];
+      const f = augmentedMatrix[i][k];
       for (let j = 0; j < 2 * n; j++) {
-        augmentedMatrix[i][j] -= factor * augmentedMatrix[k][j];
+        augmentedMatrix[i][j] -= f * augmentedMatrix[k][j];
+        operations += 2;
       }
-      steps.push(
-        `Opération de ligne ${i + 1} : r_${i + 1} - (${factor}) * r_${k + 1}`
-      );
-      steps.push(formatAugmentedMatrix(augmentedMatrix));
+      if (f != 0) {
+        steps.push(
+          `Opération de ligne ${i + 1} : r_${i + 1} - ${f} * r_${k + 1}`
+        );
+        steps.push(
+          `\\left(\\begin{matrix} ${formatAugmentedMatrix(
+            augmentedMatrix
+          )} \\end{matrix}\\right)`
+        );
+      }
     }
 
-    // Élimination des éléments en-dessous de la diagonale
     for (let i = k + 1; i < n; i++) {
-      const factor = augmentedMatrix[i][k];
+      const f = augmentedMatrix[i][k];
       for (let j = 0; j < 2 * n; j++) {
-        augmentedMatrix[i][j] -= factor * augmentedMatrix[k][j];
+        augmentedMatrix[i][j] -= f * augmentedMatrix[k][j];
+        operations += 2;
       }
-      steps.push(
-        `Opération de ligne ${i + 1} : r_${i + 1} - (${factor}) * r_${k + 1}`
-      );
-      steps.push(formatAugmentedMatrix(augmentedMatrix));
+      if (f != 0) {
+        steps.push(
+          `Opération de ligne ${i + 1} : r_${i + 1} - (${f}) * r_${k + 1}`
+        );
+        steps.push(
+          `\\left(\\begin{matrix} ${formatAugmentedMatrix(
+            augmentedMatrix
+          )} \\end{matrix}\\right)`
+        );
+      }
     }
-    steps.push(`Matrice augmentée après l'itération ${k + 1}:`);
-    steps.push(formatAugmentedMatrix(augmentedMatrix));
+
     steps.push("");
   }
+  steps.push(`Nombre total d'opérations : ${operations}`);
 
-  // Séparer la matrice inverse de la matrice augmentée
   const inverseMatrix = augmentedMatrix.map((row) => row.slice(n));
 
-  return { matrix: inverseMatrix, steps };
+  return { matrix: inverseMatrix, steps, operations };
 }
 
 export function resolveDiagonalDominant(matrix: number[][]): {
@@ -634,13 +538,19 @@ export function resolveUpperTriangular(matrix: number[][]): {
   matrix: number[][];
   steps: string[];
 } {
-  return gaussJordanWithoutPivot(matrix);
+  return gaussJordanUpperTriangular(matrix);
 }
 export function resolveLowerTriangular(matrix: number[][]): {
   matrix: number[][];
   steps: string[];
 } {
-  return gaussJordanWithoutPivot(matrix);
+  return gaussJordanLowerTriangular(matrix);
+}
+export function resolveDiagonal(matrix: number[][]): {
+  matrix: number[][];
+  steps: string[];
+} {
+  return gaussJordanDiagonal(matrix);
 }
 export function resolveBand(
   matrix: number[][],
@@ -650,7 +560,7 @@ export function resolveBand(
   steps: string[]; // The steps during the calculation
 } {
   if (!isBand(matrix, k)) {
-    throw new Error("The matrix is not diagonally dominant.");
+    throw new Error("The matrix is not Band.");
   }
   return gaussJordanBanded(matrix, k);
 }
@@ -672,7 +582,7 @@ function formatAugmentedMatrix(matrix: number[][]): string {
     })
     .join(" \\\\ ");
 
-  return `\\begin{pmatrix} ${formattedMatrix} \\end{pmatrix}`;
+  return `\\begin{matrix} ${formattedMatrix} \\end{matrix}`;
 }
 
 // Helper function to find the greatest common divisor
@@ -709,4 +619,196 @@ export function formatMatrix(matrix: number[][]): string {
   return `\\begin{bmatrix} ${matrix
     .map((row) => row.join(" & "))
     .join(" \\\\ ")} \\end{bmatrix}`;
+}
+
+export function gaussJordanUpperTriangular(matrix: number[][]): {
+  matrix: number[][];
+  steps: string[];
+} {
+  const steps: string[] = [];
+  const n = matrix.length;
+  let operations = 0;
+
+  for (let k = 0; k < n; k++) {
+    let pivot = matrix[k][k];
+
+    if (pivot === 0) {
+      steps.push(
+        `\\text{Le pivot à la position (${k + 1}, ${
+          k + 1
+        }) est nul. Résolution impossible avec ce pivot.}`
+      );
+      console.error(`Pivot nul à la position (${k + 1}, ${k + 1})`);
+      throw new Error("Pivot nul détecté");
+    }
+
+    if (pivot !== 1) {
+      steps.push(
+        `\\text{Normalisation de la ligne ${
+          k + 1
+        } en divisant par le pivot ${pivot}.}`
+      );
+      for (let j = k; j < n + 1; j++) {
+        matrix[k][j] /= pivot;
+        operations++;
+      }
+      steps.push(
+        `\\left(\\begin{matrix} ${formatAugmentedMatrix(
+          matrix
+        )} \\end{matrix}\\right)`
+      );
+    }
+
+    for (let i = 0; i < k; i++) {
+      const m = matrix[i][k];
+      for (let j = k; j < n + 1; j++) {
+        matrix[i][j] -= m * matrix[k][j];
+        operations += 2;
+      }
+
+      if (m != 0) {
+        steps.push(
+          `r_{${i + 1}} \\leftarrow r_{${i + 1}} - ${toFraction(m)} \\, r_{${
+            k + 1
+          }}`
+        );
+        steps.push(
+          `\\left(\\begin{matrix} ${formatAugmentedMatrix(
+            matrix
+          )} \\end{matrix}\\right)`
+        );
+      }
+    }
+  }
+  steps.push(`\\text{Matrice résolue }`);
+  steps.push(
+    `\\left(\\begin{matrix} ${formatAugmentedMatrix(
+      matrix
+    )} \\end{matrix}\\right)`
+  );
+  steps.push(`\\text{Nombre total d'opérations : ${operations}}`);
+  return { matrix, steps };
+}
+
+export function gaussJordanLowerTriangular(matrix: number[][]): {
+  matrix: number[][];
+  steps: string[];
+} {
+  const steps: string[] = [];
+  const n = matrix.length;
+  let operations = 0;
+
+  for (let k = 0; k < n; k++) {
+    let pivot = matrix[k][k];
+
+    if (pivot === 0) {
+      steps.push(
+        `\\text{Le pivot à la position (${k + 1}, ${
+          k + 1
+        }) est nul. Résolution impossible avec ce pivot.}`
+      );
+      console.error(`Pivot nul à la position (${k + 1}, ${k + 1})`);
+      throw new Error("Pivot nul détecté");
+    }
+
+    if (pivot !== 1) {
+      steps.push(
+        `\\text{Normalisation de la ligne ${
+          k + 1
+        } en divisant par le pivot ${pivot}.}`
+      );
+      for (let j = k; j < n + 1; j++) {
+        matrix[k][j] /= pivot;
+        operations++;
+      }
+      steps.push(
+        `\\left(\\begin{matrix} ${formatAugmentedMatrix(
+          matrix
+        )} \\end{matrix}\\right)`
+      );
+    }
+
+    for (let i = k + 1; i < n; i++) {
+      const m = matrix[i][k];
+      for (let j = k; j < n + 1; j++) {
+        matrix[i][j] -= m * matrix[k][j];
+        operations += 2;
+      }
+
+      if (m != 0) {
+        steps.push(
+          `r_{${i + 1}} \\leftarrow r_{${i + 1}} - ${toFraction(m)} \\, r_{${
+            k + 1
+          }}`
+        );
+        steps.push(
+          `\\left(\\begin{matrix} ${formatAugmentedMatrix(
+            matrix
+          )} \\end{matrix}\\right)`
+        );
+      }
+    }
+  }
+
+  steps.push(`\\text{Matrice résolue :}`);
+  steps.push(
+    `\\left(\\begin{matrix} ${formatAugmentedMatrix(
+      matrix
+    )} \\end{matrix}\\right)`
+  );
+  steps.push(`\\text{Nombre total d'opérations : ${operations}}`);
+  return { matrix, steps };
+}
+
+export function gaussJordanDiagonal(matrix: number[][]): {
+  matrix: number[][];
+  steps: string[];
+} {
+  const steps: string[] = [];
+  const n = matrix.length;
+  let operations = 0;
+
+  for (let k = 0; k < n; k++) {
+    let pivot = matrix[k][k];
+
+    if (pivot === 0) {
+      alert(
+        `Le pivot à la position (${k + 1}, ${
+          k + 1
+        }) est nul. Résolution impossible avec ce pivot.`
+      );
+      steps.push(
+        `\\text{Le pivot à la position (${k + 1}, ${
+          k + 1
+        }) est nul. Résolution impossible avec ce pivot.}`
+      );
+      console.error(`Pivot nul à la position (${k + 1}, ${k + 1})`);
+      throw new Error("Pivot nul détecté");
+    }
+    if (pivot !== 1) {
+      steps.push(
+        `\\text{Normalisation de la ligne ${
+          k + 1
+        } en divisant par le pivot ${pivot}.}`
+      );
+      for (let j = k; j < n + 1; j++) {
+        matrix[k][j] /= pivot;
+        operations++;
+      }
+      steps.push(
+        `\\left(\\begin{matrix} ${formatAugmentedMatrix(
+          matrix
+        )} \\end{matrix}\\right)`
+      );
+    }
+  }
+
+  steps.push(`\\text{Matrice résolue :}`);
+  steps.push(
+    `\\left(\\begin{matrix} ${formatAugmentedMatrix(
+      matrix
+    )} \\end{matrix}\\right)`
+  );
+  steps.push(`\\text{Nombre total d'opérations : ${operations}}`);
+  return { matrix, steps };
 }

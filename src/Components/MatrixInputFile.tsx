@@ -10,6 +10,7 @@ import {
   isUpperTriangular,
   isLowerTriangular,
   isDiagonallyDominant,
+  gaussJordanDiagonal,
 } from "../utils/matrixCalculations";
 
 const MatrixInputFile: React.FC = () => {
@@ -83,7 +84,11 @@ const MatrixInputFile: React.FC = () => {
       const firstLine = lines[0]?.toLowerCase();
       let matrixType = "";
 
-      if (["spd", "dd", "upper", "lower", "dense"].includes(firstLine)) {
+      if (
+        ["spd", "dd", "upper", "lower", "dense", "band", "diagonal"].includes(
+          firstLine
+        )
+      ) {
         matrixType = firstLine;
         lines.shift();
       }
@@ -145,6 +150,9 @@ const MatrixInputFile: React.FC = () => {
           break;
         case "lower":
           result = resolveLowerTriangular(matrix);
+          break;
+        case "diagonal":
+          result = gaussJordanDiagonal(matrix);
           break;
         default:
           throw new Error("Invalid matrix type.");

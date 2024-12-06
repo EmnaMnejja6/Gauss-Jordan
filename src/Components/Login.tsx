@@ -17,10 +17,10 @@ const Login = ({ openSignup }: { openSignup: () => void }) => {
     try {
       // Call the signIn function from authService
       const user = await signIn(email, password);
-      alert("Bienvenue ${user.email}, vous êtes connecté !");
+      alert(`Bienvenue ${user.email}, vous êtes connecté !`);
     } catch (error) {
       console.error("Erreur de connexion:", error);
-      alert("Erreur: ${error}");
+      alert(`Erreur: ${error}`);
     }
   };
   return (

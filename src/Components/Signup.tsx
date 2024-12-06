@@ -16,10 +16,10 @@ const Signup = ({ openLogin }: { openLogin: () => void }) => {
     try {
       // Call the signIn function from authService
       const user = await signUp(email, password, username);
-      alert("Bienvenue ${user.email}, votre compte a été crée!");
+      alert(`Bienvenue ${user.email}, votre compte a été créé!`);
     } catch (error) {
       console.error("Erreur de creation de compte:", error);
-      alert("Erreur: ${error}");
+      alert(`Erreur: ${error}`);
     }
   };
   return (

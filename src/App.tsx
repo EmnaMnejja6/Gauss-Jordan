@@ -7,8 +7,7 @@ import InverseCalculation from "./Components/InverseCalculation";
 import Resolution from "./Components/Resolution";
 import About from "./Components/about";
 import MatrixInputFile from "./Components/MatrixInputFile";
-import Login from "./Components/Login";
-import Signup from "./Components/Signup";
+
 import { Route, Routes, useLocation } from "react-router-dom";
 ("./Components/About");
 const App: React.FC = () => {
@@ -30,8 +29,6 @@ const App: React.FC = () => {
         <Route path="/resolution" element={<Resolution />} />
         <Route path="/inverse" element={<InverseCalculation />} />
         <Route path="/matrix-input-file" element={<MatrixInputFile />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
       </Routes>
     </div>
   );
