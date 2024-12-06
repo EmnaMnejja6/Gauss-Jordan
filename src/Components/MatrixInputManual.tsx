@@ -7,6 +7,7 @@ import {
   resolveSymmetricPositiveDefinite,
   resolveUpperTriangular,
   resolveLowerTriangular,
+  resolveDiagonal,
 } from "../utils/matrixCalculations";
 
 interface MatrixInputManualProps {
@@ -42,10 +43,10 @@ const MatrixInputManual: React.FC<MatrixInputManualProps> = ({
       let result;
 
       switch (matrixType) {
-        case "Upper Triangular":
+        case "upper":
           result = resolveUpperTriangular(augmentedMatrix);
           break;
-        case "Lower Triangular":
+        case "lower":
           result = resolveLowerTriangular(augmentedMatrix);
           break;
         case "Diagonal Dominant":
@@ -57,6 +58,9 @@ const MatrixInputManual: React.FC<MatrixInputManualProps> = ({
         case "Band":
           result = resolveBand(augmentedMatrix, bandWidth);
           break;
+        case "Diagonal":
+          result=resolveDiagonal(augmentedMatrix);
+          break;  
         case "Dense":
         default:
           result = gaussJordanWithPivot(augmentedMatrix);
@@ -211,6 +215,9 @@ const MatrixInputManual: React.FC<MatrixInputManualProps> = ({
       case "Band":
         matrixTypeCode = "band";
         break;
+      case "Diagonal":
+        matrixTypeCode="diagonal";
+        break;  
       default:
         matrixTypeCode = "unknown";
     }
@@ -254,6 +261,7 @@ const MatrixInputManual: React.FC<MatrixInputManualProps> = ({
               label: "Symétrique Définie Positive",
             },
             { type: "Band", label: "Bande" },
+            {type: "Diagonal", label: "Diagonale" },
           ].map(({ type, label }, idx) => (
             <button
               key={idx}
@@ -346,7 +354,8 @@ const MatrixInputManual: React.FC<MatrixInputManualProps> = ({
                                 (matrixType === "Symmetric Positive Definite" &&
                                   rowIndex < colIndex) ||
                                 (matrixType === "Band" &&
-                                  Math.abs(rowIndex - colIndex) > bandWidth)
+                                  Math.abs(rowIndex - colIndex) > bandWidth)||
+                            (matrixType === "Diagonal" && rowIndex !== colIndex) 
                               }
                             />
                           </td>

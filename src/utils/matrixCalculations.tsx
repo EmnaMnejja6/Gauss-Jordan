@@ -30,6 +30,7 @@ function isBand(mat: number[][], k: number): boolean {
   return true;
 }
 
+
 export function isLowerTriangular(mat: number[][]): boolean {
   console.log(mat);
   return false;
@@ -242,6 +243,7 @@ export function gaussJordanWithoutPivot(matrix: number[][]): {
     for (let j = k; j < n + 1; j++) {
       matrix[k][j] /= pivot;
       operations++;
+      operations++;
     }
 
     steps.push(`\\text{ Normalisation de } r_${k + 1}`);
@@ -252,6 +254,7 @@ export function gaussJordanWithoutPivot(matrix: number[][]): {
     );
 
     for (let i = 0; i < k; i++) {
+      const m = matrix[i][k];
       const m = matrix[i][k];
       for (let j = k; j < n + 1; j++) {
         matrix[i][j] -= m * matrix[k][j];
@@ -271,6 +274,7 @@ export function gaussJordanWithoutPivot(matrix: number[][]): {
     }
 
     for (let i = k + 1; i < n; i++) {
+      const m = matrix[i][k];
       const m = matrix[i][k];
       for (let j = k; j < n + 1; j++) {
         matrix[i][j] -= m * matrix[k][j];
@@ -347,6 +351,7 @@ export function gaussJordanWithPivot(matrix: number[][]): {
     for (let j = k; j < n + 1; j++) {
       matrix[k][j] /= pivot;
       operations++;
+      operations++;
     }
 
     steps.push(
@@ -357,6 +362,7 @@ export function gaussJordanWithPivot(matrix: number[][]): {
     console.log(`Matrice après normalisation de la ligne ${k + 1}:`, matrix);
 
     for (let i = 0; i < k; i++) {
+      const m = matrix[i][k];
       const m = matrix[i][k];
       for (let j = k; j < n + 1; j++) {
         matrix[i][j] -= m * matrix[k][j];
@@ -378,6 +384,7 @@ export function gaussJordanWithPivot(matrix: number[][]): {
     }
 
     for (let i = k + 1; i < n; i++) {
+      const m = matrix[i][k];
       const m = matrix[i][k];
       for (let j = k; j < n + 1; j++) {
         matrix[i][j] -= m * matrix[k][j];
@@ -459,6 +466,7 @@ export function inverseMatrix(mat: number[][]): {
     for (let j = 0; j < 2 * n; j++) {
       augmentedMatrix[k][j] /= diag;
       operations++;
+      operations++;
     }
     steps.push(`Normalisation de la ligne ${k + 1}`);
     steps.push(
@@ -467,6 +475,7 @@ export function inverseMatrix(mat: number[][]): {
       )} \\end{matrix}\\right)`
     );
     for (let i = 0; i < k; i++) {
+      const f = augmentedMatrix[i][k];
       const f = augmentedMatrix[i][k];
       for (let j = 0; j < 2 * n; j++) {
         augmentedMatrix[i][j] -= f * augmentedMatrix[k][j];
@@ -486,6 +495,7 @@ export function inverseMatrix(mat: number[][]): {
 
     for (let i = k + 1; i < n; i++) {
       const f = augmentedMatrix[i][k];
+      const f = augmentedMatrix[i][k];
       for (let j = 0; j < 2 * n; j++) {
         augmentedMatrix[i][j] -= f * augmentedMatrix[k][j];
         operations += 2;
@@ -502,12 +512,14 @@ export function inverseMatrix(mat: number[][]): {
       }
     }
 
+
     steps.push("");
   }
   steps.push(`Nombre total d'opérations : ${operations}`);
 
   const inverseMatrix = augmentedMatrix.map((row) => row.slice(n));
 
+  return { matrix: inverseMatrix, steps, operations };
   return { matrix: inverseMatrix, steps, operations };
 }
 
@@ -539,6 +551,7 @@ export function resolveUpperTriangular(matrix: number[][]): {
   steps: string[];
 } {
   return gaussJordanUpperTriangular(matrix);
+  return gaussJordanUpperTriangular(matrix);
 }
 export function resolveLowerTriangular(matrix: number[][]): {
   matrix: number[][];
@@ -560,6 +573,7 @@ export function resolveBand(
   steps: string[]; // The steps during the calculation
 } {
   if (!isBand(matrix, k)) {
+    throw new Error("The matrix is not Band.");
     throw new Error("The matrix is not Band.");
   }
   return gaussJordanBanded(matrix, k);

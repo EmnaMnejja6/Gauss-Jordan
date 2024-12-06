@@ -7,6 +7,7 @@ import {
   resolveSymmetricPositiveDefinite,
   resolveLowerTriangular,
   resolveUpperTriangular,
+  resolveDiagonal,
 } from "../utils/matrixCalculations";
 const SystemResolution: React.FC = () => {
   const [matrixSize, setMatrixSize] = useState<number>(3);
@@ -38,10 +39,10 @@ const SystemResolution: React.FC = () => {
       let result;
 
       switch (matrixType) {
-        case "Upper Triangular":
+        case "upper":
           result = resolveUpperTriangular(augmentedMatrix);
           break;
-        case "Lower Triangular":
+        case "lower":
           result = resolveLowerTriangular(augmentedMatrix);
           break;
         case "Diagonal Dominant":
@@ -50,6 +51,9 @@ const SystemResolution: React.FC = () => {
         case "Symmetric Positive Definite":
           result = resolveSymmetricPositiveDefinite(augmentedMatrix);
           break;
+        case "Diagonal":
+          result=resolveDiagonal(augmentedMatrix);
+          break;  
         case "Band":
           result = resolveBand(augmentedMatrix, bandWidth);
           break;
@@ -142,6 +146,13 @@ const SystemResolution: React.FC = () => {
               : 0;
         }
       }
+    }else if (matrixType=="Diagonal"){
+      for (let i = 0; i < matrixSize; i++) {
+        for (let j = 0; j < matrixSize; j++) {
+          newMatrix[i][j] =
+            i === j ? Math.floor(Math.random() * 20) - 10 : 0;
+        }
+      }
     }
     
     setMatrix(newMatrix);
@@ -185,6 +196,9 @@ const SystemResolution: React.FC = () => {
       case "Band":
         matrixTypeCode = "band";
         break;
+      case "Diagonal":
+        matrixTypeCode = "diagonal";
+        break;  
       default:
         matrixTypeCode = "unknown";
     }
@@ -261,6 +275,7 @@ const SystemResolution: React.FC = () => {
               label: "Symétrique Définie Positive",
             },
             { type: "Band", label: "Bande" },
+            { type: "Diagonal", label: "Diagonale" },
           ].map(({ type, label }, idx) => (
             <button
               key={idx}
