@@ -1,5 +1,5 @@
 specVersion: "v1beta"
-serviceId: "gauss-jordan"
+serviceId: "Gauss-Jordan"
 location: "us-central1"
 schema:
   source: "./schema"
@@ -7,6 +7,6 @@ schema:
     postgresql:
       database: "fdcdb"
       cloudSql:
-        instanceId: "gauss-jordan-fdc"
+        instanceId: "Gauss-Jordan-fdc"
       # schemaValidation: "COMPATIBLE"
 connectorDirs: ["./connector"]

@@ -38,8 +38,7 @@ const Home: React.FC = () => {
             lignes. En langage courant, on dit que la transformation d’une
             matrice en FER est une réduction.
           </p>
-
-          <h3 style={styles.sectionTitle}>Appliquer la méthode</h3>
+          {/*<h3 style={styles.sectionTitle}>Appliquer la méthode</h3>
           <button style={styles.practiceButton}>
             <a
               style={{ color: "white" }}
@@ -48,7 +47,7 @@ const Home: React.FC = () => {
             >
               Exercices
             </a>
-          </button>
+          </button>*/}
 
           <h3 style={styles.sectionTitle}>Regarder une vidéo</h3>
           <iframe

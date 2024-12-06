@@ -1,0 +1,13 @@
+.matrix-input {
+    width: 40px; /* Adjust size for better visual fit */
+    text-align: center; /* Center-align numbers */
+    border: none; /* Remove borders for clean look */
+    background: transparent; /* Blend background */
+    font-family: 'Times New Roman', Times, serif; /* Match MathJax font */
+    font-size: 18px; /* Adjust size to match matrix font */
+  }
+  .matrix-input:focus {
+    outline: none; /* Remove focus outline */
+    border-bottom: 1px solid #084cac; /* Highlight active field */
+  }
+  

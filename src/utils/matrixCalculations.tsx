@@ -96,9 +96,70 @@ export function gaussJordanBanded(
   return { matrix, steps };
 }
 */
-export function isLowerTriangular(mat: number[][]): boolean {
-  console.log(mat);
-  return false;
+export function isLowerTriangular(matrix: number[][]): {
+  matrix: number[][];
+  steps: string[];
+} {
+  const steps: string[] = [];
+  const n = matrix.length;
+
+  for (let k = 0; k < n; k++) {
+    // Normalize row k
+    const pivot = matrix[k][k];
+    if (pivot === 0) {
+      steps.push(`\\text{Pivot est zero ${k + 1}, matrice is singuliere.}`);
+      return { matrix, steps };
+    }
+
+    // Normalize the pivot row
+    for (let j = k; j < n + 1; j++) {
+      matrix[k][j] /= pivot;
+    }
+
+    // Log after normalization
+    steps.push(`\\text{ Normalisation de } r_${k + 1}`);
+    steps.push(
+      `\\left(\\begin{matrix} ${formatAugmentedMatrix(
+        matrix
+      )} \\end{matrix}\\right)`
+    );
+
+    for (let i = 0; i < k; i++) {
+      const multiplier = matrix[i][k];
+      for (let j = k; j < n + 1; j++) {
+        matrix[i][j] -= multiplier * matrix[k][j];
+      }
+
+      // Log after each row operation
+      steps.push(`\\ r_${i + 1} - (${toFraction(multiplier)}) r${k + 1}`);
+      steps.push(
+        `\\left(\\begin{matrix} ${formatAugmentedMatrix(
+          matrix
+        )} \\end{matrix}\\right)`
+      );
+    }
+
+    for (let i = k + 1; i < n; i++) {
+      const multiplier = matrix[i][k];
+      for (let j = k; j < n + 1; j++) {
+        matrix[i][j] -= multiplier * matrix[k][j];
+      }
+
+      // Log after each row operation
+      steps.push(
+        `\\text{Row operation } r_${i + 1} - (${toFraction(multiplier)}) r_${
+          k + 1
+        }`
+      );
+      steps.push(
+        `\\left(\\begin{matrix} ${formatAugmentedMatrix(
+          matrix
+        )} \\end{matrix}\\right)`
+      );
+    }
+  }
+
+  return { matrix, steps };
 }
 export function isUpperTriangular(mat: number[][]): boolean {
   console.log(mat);
@@ -611,7 +672,7 @@ function formatAugmentedMatrix(matrix: number[][]): string {
     })
     .join(" \\\\ ");
 
-  return `\\begin{matrix} ${formattedMatrix} \\end{matrix}`;
+  return `\\begin{pmatrix} ${formattedMatrix} \\end{pmatrix}`;
 }
 
 // Helper function to find the greatest common divisor

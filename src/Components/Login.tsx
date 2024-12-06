@@ -1,70 +1,79 @@
-const Login = () => {
-  const style = {
-    formContainer: {
-      width: "80%",
-      backgroundColor: "white",
-    },
-    "@media screen and (max-width: 1000px)": {
-      formContainer: {
-        width: "45%",
-      },
-    },
-    "@media screen and (max-width: 700px)": {
-      formContainer: {
-        width: "65%",
-      },
-    },
-  };
+import { useState } from "react";
+import { signIn } from "../firebase/firebaseAuthServices";
 
+const Login = ({ openSignup }: { openSignup: () => void }) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  // Handle form submission
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+
+    if (!email || !password) {
+      alert("Veuillez remplir tous les champs !");
+      return;
+    }
+
+    try {
+      // Call the signIn function from authService
+      const user = await signIn(email, password);
+      alert("Bienvenue ${user.email}, vous êtes connecté !");
+    } catch (error) {
+      console.error("Erreur de connexion:", error);
+      alert("Erreur: ${error}");
+    }
+  };
   return (
-    <div className="login template d-flex justify-content-center align-items-center vh-100 bg-primary">
-      <div className="p-5 rounded bg-white" style={style.formContainer}>
-        <form>
-          <h3>Se Connecter</h3>
-          <div className="mb-2">
-            <label htmlFor="email" className="form-label">
-              <i className="bx bx-mail-send"></i> Nom d'utilisateur
-            </label>
-            <input
-              type="email"
-              id="email"
-              placeholder="Email"
-              required
-              className="form-control"
-            />
-          </div>
-          <div className="mb-2">
-            <label htmlFor="password" className="form-label">
-              <i className="bx bx-lock-alt"></i> Mot de Passe
-            </label>
-            <input
-              type="password"
-              id="password"
-              placeholder="Mot de passe"
-              required
-              className="form-control"
-            />
-          </div>
-          <div className="mb-3">
-            <input type="checkbox" className="form-check-input" id="check" />
-            <label htmlFor="check" className="form-check-label">
-              Se souvenir de moi sur ce device.
-            </label>
-          </div>
-          <div className="d-grid">
-            <button type="submit" className="btn btn-primary">
-              <i className="bx bx-log-in"></i> Se Connecter
-            </button>
-          </div>
-          <p className="text-end mt-2">
-            Vous n'avez pas de compte?{" "}
-            <a href="/signup">
-              <i className="bx bx-user-plus"></i> Inscrivez-vous
-            </a>
-          </p>
-        </form>
+    <form>
+      <h3>Login</h3>
+      <div className="mb-3">
+        <label htmlFor="email" className="form-label">
+          <i className="bx bx-mail-send"></i> Email
+        </label>
+        <input
+          type="email"
+          className="form-control"
+          id="email"
+          placeholder="Votre email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
       </div>
-    </div>
+      <div className="mb-3">
+        <label htmlFor="password" className="form-label">
+          <i className="bx bx-lock-alt"></i> Mot de Passe
+        </label>
+        <input
+          type="password"
+          className="form-control"
+          id="password"
+          placeholder="Votre mot de passe"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+      </div>
+      <div className="d-grid">
+        <button
+          type="submit"
+          className="btn btn-primary"
+          onClick={handleSubmit}
+        >
+          <i className="bx bx-log-in"></i> Se connecter
+        </button>
+      </div>
+      <p className="text-end mt-3">
+        Vous n'avez pas de compte?{" "}
+        <a
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            openSignup();
+          }}
+        >
+          <i className="bx bx-user-plus"></i> Créer un compte
+        </a>
+      </p>
+    </form>
   );
 };
 

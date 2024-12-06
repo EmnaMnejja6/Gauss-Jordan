@@ -74,6 +74,12 @@ const SystemResolution: React.FC = () => {
   };
 
   const handleRandomMatrix = () => {
+    // Random vector b
+    const newVector = Array(matrixSize)
+      .fill(0)
+      .map(() => Math.floor(Math.random() * 20) - 10);
+
+    //handle random matrix A
     let newMatrix = Array(matrixSize)
       .fill(0)
       .map(() => Array(matrixSize).fill(0));
@@ -137,16 +143,12 @@ const SystemResolution: React.FC = () => {
         }
       }
     }
-
-    // Random vector b
-    const newVector = Array(matrixSize)
-      .fill(0)
-      .map(() => Math.floor(Math.random() * 20) - 10);
-
+    
     setMatrix(newMatrix);
     setVector(newVector);
     setError(null);
   };
+
   const handleClearMatrix = () => {
     const newMatrix = Array(matrixSize)
       .fill(0)
@@ -156,6 +158,7 @@ const SystemResolution: React.FC = () => {
     setSteps([]);
     //setMatrixType(null);
     setError(null);
+    setVector(Array(matrixSize).fill(0));
     //
     //setFileImported(false);
   };
@@ -266,7 +269,10 @@ const SystemResolution: React.FC = () => {
                 matrixType === type ? "btn-dark" : "btn-outline-dark"
               }`}
               style={{ flex: 1 }}
-              onClick={() => setMatrixType(type)}
+              onClick={() => {
+                setMatrixType(type);
+                handleRandomMatrix();
+              }}
             >
               {label}
             </button>
@@ -297,7 +303,13 @@ const SystemResolution: React.FC = () => {
         )}
       </div>
 
-      <div className="button-container mt-3">
+      <div className="button-container mt-3" style={{ textAlign: "center" }}>
+        <button className="btn btn-warning ms-2" onClick={handleRandomMatrix}>
+          <span>
+            <i style={{ fontSize: "16px" }} className="bx bx-refresh"></i>
+          </span>{" "}
+          Générer
+        </button>
         <button className="btn btn-danger ms-2" onClick={handleClearMatrix}>
           <span>
             <i
@@ -307,14 +319,11 @@ const SystemResolution: React.FC = () => {
           </span>
           Effacer
         </button>
-
-        <button className="btn btn-warning ms-2" onClick={handleRandomMatrix}>
-          <span>
-            <i style={{ fontSize: "18px" }} className="bx bx-refresh"></i>
-          </span>{" "}
-          Générer
-        </button>
-        <button className="btn btn-success ms-2" onClick={handleDownloadMatrix}>
+        <button
+          className="btn btn-success ms-2"
+          onClick={handleDownloadMatrix}
+          title="Télécharger la matrice augmentée du système" // Hover text
+        >
           <span>
             <i
               style={{ fontSize: "16px", color: "white", marginRight: "5px" }}
@@ -323,6 +332,7 @@ const SystemResolution: React.FC = () => {
           </span>
           Télécharger la matrice
         </button>
+
         <br />
       </div>
       <div className="row">

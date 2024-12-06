@@ -202,10 +202,10 @@ const MatrixInputManual: React.FC<MatrixInputManualProps> = ({
       case "Symmetric Positive Definite":
         matrixTypeCode = "spd";
         break;
-      case "lower":
+      case "Lower Triangular":
         matrixTypeCode = "lower";
         break;
-      case "upper":
+      case "Upper Triangular":
         matrixTypeCode = "upper";
         break;
       case "Band":
@@ -292,7 +292,7 @@ const MatrixInputManual: React.FC<MatrixInputManualProps> = ({
           </div>
         )}
       </div>
-
+      {/*saisie*/}
       <h4>Saisie de la matrice A et du vecteur b</h4>
       <label>Taille de la matrice: </label>
       <input
@@ -305,68 +305,121 @@ const MatrixInputManual: React.FC<MatrixInputManualProps> = ({
       />
 
       <div className="row">
-        <div className="col-md-8">
+        {/* Matrix A */}
+        <div className="col-md-6">
           <MathJaxContext>
-            <MathJax dynamic>{`\\[ A = ${renderMatrix()} \\]`}</MathJax>
-          </MathJaxContext>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {/* A = */}
+              <MathJax dynamic>{`\\[ A = \\]`}</MathJax>
 
-          <div className="table-responsive">
-            <table className="table table-bordered">
-              <tbody>
-                {matrix.map((row, rowIndex) => (
-                  <tr key={rowIndex}>
-                    {row.map((value, colIndex) => (
-                      <td key={colIndex}>
-                        <input
-                          type="number"
-                          value={value}
-                          onChange={(e) =>
-                            handleMatrixChange(e, rowIndex, colIndex)
-                          }
-                          className="form-control"
-                          disabled={
-                            (matrixType === "lower" && rowIndex < colIndex) ||
-                            (matrixType === "upper" && rowIndex > colIndex) ||
-                            (matrixType === "Symmetric Positive Definite" &&
-                              rowIndex < colIndex) ||
-                            (matrixType === "Band" &&
-                              Math.abs(rowIndex - colIndex) > bandWidth)
-                          }
-                        />
-                      </td>
+              {/* Open Parenthesis */}
+              <MathJax dynamic>
+                <div style={{ fontSize: "35px" }}>{`\\[ \\bigg[ \\]`}</div>
+              </MathJax>
+
+              {/* Inputs for Matrix A */}
+              <div className="table-responsive">
+                <table className="table table-borderless">
+                  <tbody>
+                    {matrix.map((row, rowIndex) => (
+                      <tr key={rowIndex}>
+                        {row.map((value, colIndex) => (
+                          <td key={colIndex}>
+                            <input
+                              type="number"
+                              value={value}
+                              onChange={(e) =>
+                                handleMatrixChange(e, rowIndex, colIndex)
+                              }
+                              className="form-control"
+                              disabled={
+                                (matrixType === "lower" &&
+                                  rowIndex < colIndex) ||
+                                (matrixType === "upper" &&
+                                  rowIndex > colIndex) ||
+                                (matrixType === "Symmetric Positive Definite" &&
+                                  rowIndex < colIndex) ||
+                                (matrixType === "Band" &&
+                                  Math.abs(rowIndex - colIndex) > bandWidth)
+                              }
+                            />
+                          </td>
+                        ))}
+                      </tr>
                     ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Close Parenthesis */}
+              <MathJax dynamic>
+                <div style={{ fontSize: "35px" }}>{`\\[ \\bigg] \\]`}</div>
+              </MathJax>
+            </div>
+          </MathJaxContext>
         </div>
 
+        {/* Vector b */}
         <div className="col-md-4">
           <MathJaxContext>
-            <MathJax dynamic>{`\\[ b= ${renderVector()} \\]`}</MathJax>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {/* b = */}
+              <MathJax dynamic>{`\\[ b = \\]`}</MathJax>
+
+              {/* Open Parenthesis */}
+              <MathJax dynamic>
+                <div style={{ fontSize: "30px" }}>{`\\[ \\bigg( \\]`}</div>
+              </MathJax>
+
+              {/* Inputs for Vector b */}
+              <div className="table-responsive" style={{ margin: "0 10px" }}>
+                <table className="table table-borderless">
+                  <tbody>
+                    {vector.map((value, index) => (
+                      <tr key={index}>
+                        <td>
+                          <input
+                            type="number"
+                            value={value}
+                            onChange={(e) => handleVectorChange(e, index)}
+                            className="form-control"
+                            placeholder={`b[${index}]`}
+                            style={{
+                              textAlign: "center",
+                              borderRadius: "8px",
+                              border: "1px solid #ced4da",
+                              width: "60px",
+                            }}
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Close Parenthesis */}
+              <MathJax dynamic>
+                <div style={{ fontSize: "30px" }}>{`\\[ \\bigg) \\]`}</div>
+              </MathJax>
+            </div>
           </MathJaxContext>
-          <div className="table-responsive">
-            <table className="table table-bordered">
-              <tbody>
-                {vector.map((value, index) => (
-                  <tr key={index}>
-                    <td>
-                      <input
-                        type="number"
-                        value={value}
-                        onChange={(e) => handleVectorChange(e, index)}
-                        className="form-control"
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
         </div>
       </div>
 
+      {/*buttons*/}
       <div className="button-container mt-3">
         <button className="btn btn-primary" onClick={handleResolution}>
           Résolution
@@ -390,25 +443,36 @@ const MatrixInputManual: React.FC<MatrixInputManualProps> = ({
           Télécharger la matrice
         </button>
       </div>
-
       {solutionMatrix && (
         <div>
-          <h2>Résolution du système</h2>
+          <h4>Résolution du système</h4>
+          <div className="row">
+            <div className="col-md-7">
+              <MathJaxContext>
+                <MathJax dynamic>{`\\[ A = ${renderMatrix()} \\]`}</MathJax>
+              </MathJaxContext>
+            </div>
+            <div className="col-md-5">
+              <MathJaxContext>
+                <MathJax dynamic>{`\\[ b = ${renderVector()} \\]`}</MathJax>
+              </MathJaxContext>
+            </div>
+          </div>
+          <h4>Solution</h4>
           <MathJaxContext>
-            <MathJax dynamic>{`\\[ b = ${renderSolutionMatrix()} \\]`}</MathJax>
+            <MathJax dynamic>{`\\[ X = ${renderSolutionMatrix()} \\]`}</MathJax>
           </MathJaxContext>
+          <button
+            className="btn btn-secondary mt-3"
+            onClick={() => setShowSteps(!showSteps)}
+          >
+            {showSteps ? "Masquer les étapes" : "Montrer les étapes"}
+          </button>
         </div>
       )}
-      <button
-        className="btn btn-secondary mt-3"
-        onClick={() => setShowSteps(!showSteps)}
-      >
-        {showSteps ? "Hide Steps" : "Show Steps"}
-      </button>
 
       {showSteps && (
         <div className="steps-container mt-3">
-          <h3>Solution Steps</h3>
           {steps.map((step, index) => (
             <div key={index}>
               <MathJaxContext>

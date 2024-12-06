@@ -20,52 +20,61 @@ const Resolution: React.FC = () => {
 
   return (
     <div>
-    <div
-      className="container card shadow p-4 mb-5 bg-white rounded"
-      style={{
-        maxWidth: "1000px",
-        marginLeft: "380px",
-        marginTop: "80px",
-        fontSize: "18px",
-      }}
-    >
-      <h3 className="text-center mb-4">Choisir le type de saisie</h3>
-      
       <div
-        className="btn-group d-flex mb-4"
-        role="group"
-        aria-label="Input Type"
+        className="container card shadow p-4 mb-5 bg-white rounded"
+        style={{
+          maxWidth: "1000px",
+          marginLeft: "280px",
+          marginTop: "80px",
+          fontSize: "18px",
+        }}
       >
-        {[
-          { value: "manual", label: "Saisie Manuelle" },
-          { value: "random", label: "Aléatoire" },
-          { value: "file", label: "Importer à partir d'un fichier" },
-        ].map(({ value, label }) => (
-          <button
-            key={value}
-            type="button"
-            className={`btn ${
-              inputType === value ? "btn-primary" : "btn-outline-primary"
-            }`}
-            style={{
-              flex: 1,
-            }}
-            onClick={() => setInputType(value)}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+        <h3 className="text-center mb-4">Choisir le type de saisie</h3>
 
-      {inputType === "manual" && (
-        <MatrixInputManual
-          matrixSize={matrixSize}
-          onMatrixSizeChange={handleMatrixSizeChange}
-        />
-      )}
-      {inputType === "random" && <MatrixInputRandom />}
-      {inputType === "file" && <MatrixInputFile />}
-    </div>
+        <div
+          className="btn-group d-flex mb-4"
+          role="group"
+          aria-label="Input Type"
+        >
+          {[
+            { value: "manual", label: "Saisie Manuelle", icon: "bx-pencil" },
+            { value: "random", label: "Aléatoire", icon: "bx-dice-5" },
+            {
+              value: "file",
+              label: "Importer à partir d'un fichier",
+              icon: "bx-upload",
+            },
+          ].map(({ value, label, icon }) => (
+            <button
+              key={value}
+              type="button"
+              className={`btn ${
+                inputType === value ? "btn-primary" : "btn-outline-primary"
+              }`}
+              style={{
+                flex: 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "5px", // Space between icon and text
+              }}
+              onClick={() => setInputType(value)}
+            >
+              <i className={`bx ${icon}`} style={{ fontSize: "20px" }}></i>
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {inputType === "manual" && (
+          <MatrixInputManual
+            matrixSize={matrixSize}
+            onMatrixSizeChange={handleMatrixSizeChange}
+          />
+        )}
+        {inputType === "random" && <MatrixInputRandom />}
+        {inputType === "file" && <MatrixInputFile />}
+      </div>
     </div>
   );
 };
