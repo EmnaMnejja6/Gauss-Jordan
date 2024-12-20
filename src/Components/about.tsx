@@ -67,8 +67,8 @@ const About: React.FC = () => {
               borderBottom: "1px solid #ddd",
             }}
           >
-            <strong>➤</strong> Possibilité de saisie manuelle de matrices
-            (taille jusqu'à 10).
+            <strong>➤</strong> Résolution des systèmes linéaires avec saisie
+            manuelle de matrices (taille jusqu'à 5).
           </li>
           <li
             style={{
@@ -77,8 +77,8 @@ const About: React.FC = () => {
               borderBottom: "1px solid #ddd",
             }}
           >
-            <strong>➤</strong> Génération aléatoire de matrices (taille jusqu'à
-            10).
+            <strong>➤</strong> Résolution des systèmes linéaires avec génération
+            aléatoire de matrices (taille jusqu'à 5).
           </li>
           <li
             style={{
@@ -87,8 +87,9 @@ const About: React.FC = () => {
               borderBottom: "1px solid #ddd",
             }}
           >
-            <strong>➤</strong> Importation de matrices à partir d'un fichier
-            avec détection automatique du type de matrice.
+            <strong>➤</strong> Résolution des systèmes linéaires par importation
+            de matrices agumentées (n * n+1) à partir d'un fichier avec
+            détection automatique du type de matrice.
           </li>
           <li
             style={{
@@ -99,6 +100,24 @@ const About: React.FC = () => {
           >
             <strong>➤</strong> Téléchargement de la matrice augmentée du système
             dans un fichier pour une réutilisabilité facile.
+          </li>
+          <li
+            style={{
+              marginBottom: "1rem",
+              padding: "0.5rem",
+              borderBottom: "1px solid #ddd",
+            }}
+          >
+            <strong>➤</strong> Calcul d'inverse d'une matrice
+          </li>
+          <li
+            style={{
+              marginBottom: "1rem",
+              padding: "0.5rem",
+              borderBottom: "1px solid #ddd",
+            }}
+          >
+            <strong>➤</strong> Calcul de determinant d'une matrice
           </li>
           <li
             style={{

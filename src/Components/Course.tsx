@@ -3,6 +3,9 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { coy } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 const Cours = () => {
+  const formula = `
+      \\text{det}(A) = (-1)^p \\cdot \\prod_{j=1}^n A[k, j]
+    `;
   const exampleMatrix = `
     \\left( \\begin{array}{ccc|c}
       2 & 1 & -1 & 8 \\\\
@@ -35,7 +38,14 @@ const Cours = () => {
   `;
 
   return (
-    <div style={{ marginTop: "80px", marginLeft: "350px", padding: "auto" , maxWidth:"120vh"}}>
+    <div
+      style={{
+        marginTop: "80px",
+        marginLeft: "350px",
+        padding: "auto",
+        maxWidth: "120vh",
+      }}
+    >
       <MathJaxContext>
         <div className="container my-5">
           <div className="card shadow-sm">
@@ -116,6 +126,29 @@ const Cours = () => {
                   <strong>Calcul du déterminant :</strong> La méthode de Gauss
                   peut être utilisée pour calculer le déterminant d'une matrice
                   carrée.
+                  <MathJaxContext
+                    config={{
+                      tex: {
+                        inlineMath: [["\\(", "\\)"]],
+                        displayMath: [["$$", "$$"]],
+                      },
+                    }}
+                  >
+                    <div>
+                      <MathJax>
+                        <p>{`$$${formula}$$`}</p>
+                      </MathJax>
+                      <p>
+                        avec p le nombre de permutations de lignes, et
+                        (A[k, j] le pivot noté à l&apos;étape j de
+                        l&apos;algorithme.
+                      </p>
+                      <p>
+                        Si l'un des pivots est nul, alors le déterminant de la
+                        matrice est nul et celle-ci n'est pas inversible.
+                      </p>
+                    </div>
+                  </MathJaxContext>
                 </li>
                 <li>
                   <strong>Recherche de l'inverse d'une matrice :</strong>{" "}
