@@ -8,7 +8,7 @@ import {
   resolveLowerTriangular,
   resolveUpperTriangular,
   resolveDiagonal,
-} from "../utils/matrixCalculations";
+} from "../../utils/matrixCalculations";
 const SystemResolution: React.FC = () => {
   const [matrixSize, setMatrixSize] = useState<number>(3);
   const [matrixType, setMatrixType] = useState<string>("");
@@ -52,8 +52,8 @@ const SystemResolution: React.FC = () => {
           result = resolveSymmetricPositiveDefinite(augmentedMatrix);
           break;
         case "Diagonal":
-          result=resolveDiagonal(augmentedMatrix);
-          break;  
+          result = resolveDiagonal(augmentedMatrix);
+          break;
         case "Band":
           result = resolveBand(augmentedMatrix, bandWidth);
           break;
@@ -78,86 +78,99 @@ const SystemResolution: React.FC = () => {
   };
 
   const handleRandomMatrix = () => {
-    // Random vector b
-    const newVector = Array(matrixSize)
-      .fill(0)
-      .map(() => Math.floor(Math.random() * 20) - 10);
-
-    //handle random matrix A
-    let newMatrix = Array(matrixSize)
-      .fill(0)
-      .map(() => Array(matrixSize).fill(0));
-
-    if (matrixType === "Dense") {
-      newMatrix = Array(matrixSize)
+    // Ensure that both matrix and vector are generated only after selecting the type
+    if (matrixType && matrixSize) {
+      // Random vector b
+      const newVector = Array(matrixSize)
         .fill(0)
-        .map(() =>
-          Array(matrixSize)
-            .fill(0)
-            .map(() => Math.floor(Math.random() * 20) - 10)
-        );
-    } else if (matrixType === "lower") {
-      for (let i = 0; i < matrixSize; i++) {
-        for (let j = 0; j < matrixSize; j++) {
-          newMatrix[i][j] = j <= i ? Math.floor(Math.random() * 20) - 10 : 0;
-        }
-      }
-    } else if (matrixType === "upper") {
-      for (let i = 0; i < matrixSize; i++) {
-        for (let j = 0; j < matrixSize; j++) {
-          newMatrix[i][j] = j >= i ? Math.floor(Math.random() * 20) - 10 : 0;
-        }
-      }
-    } else if (matrixType === "Diagonal Dominant") {
-      for (let i = 0; i < matrixSize; i++) {
-        let rowSum = 0;
-        for (let j = 0; j < matrixSize; j++) {
-          if (i !== j) {
-            newMatrix[i][j] = Math.floor(Math.random() * 20) - 10;
-            rowSum += Math.abs(newMatrix[i][j]);
-          }
-        }
-        // Ensure diagonal dominance
-        newMatrix[i][i] = rowSum + Math.floor(Math.random() * 10) + 1;
-      }
-    } else if (matrixType === "Symmetric Positive Definite") {
-      const A = Array(matrixSize)
+        .map(() => Math.floor(Math.random() * 20) - 10);
+
+      let newMatrix = Array(matrixSize)
         .fill(0)
-        .map(() =>
-          Array(matrixSize)
+        .map(() => Array(matrixSize).fill(0));
+
+      // Handle different matrix types
+      switch (matrixType) {
+        case "Dense":
+          newMatrix = Array(matrixSize)
             .fill(0)
-            .map(() => Math.floor(Math.random() * 10) + 1)
-        );
-      // Multiply A by its transpose
-      for (let i = 0; i < matrixSize; i++) {
-        for (let j = 0; j < matrixSize; j++) {
-          for (let k = 0; k < matrixSize; k++) {
-            newMatrix[i][j] += A[k][i] * A[k][j]; // Symmetric Positive Definite
+            .map(() =>
+              Array(matrixSize)
+                .fill(0)
+                .map(() => Math.floor(Math.random() * 20) - 10)
+            );
+          break;
+        case "lower":
+          for (let i = 0; i < matrixSize; i++) {
+            for (let j = 0; j <= i; j++) {
+              newMatrix[i][j] = Math.floor(Math.random() * 20) - 10;
+            }
           }
-        }
+          break;
+        case "upper":
+          for (let i = 0; i < matrixSize; i++) {
+            for (let j = i; j < matrixSize; j++) {
+              newMatrix[i][j] = Math.floor(Math.random() * 20) - 10;
+            }
+          }
+          break;
+        case "Diagonal Dominant":
+          for (let i = 0; i < matrixSize; i++) {
+            let rowSum = 0;
+            for (let j = 0; j < matrixSize; j++) {
+              if (i !== j) {
+                newMatrix[i][j] = Math.floor(Math.random() * 20) - 10;
+                rowSum += Math.abs(newMatrix[i][j]);
+              }
+            }
+            newMatrix[i][i] = rowSum + Math.floor(Math.random() * 10) + 1;
+          }
+          break;
+        case "Symmetric Positive Definite":
+          const A = Array(matrixSize)
+            .fill(0)
+            .map(() =>
+              Array(matrixSize)
+                .fill(0)
+                .map(() => Math.floor(Math.random() * 10) + 1)
+            );
+          for (let i = 0; i < matrixSize; i++) {
+            for (let j = 0; j < matrixSize; j++) {
+              for (let k = 0; k < matrixSize; k++) {
+                newMatrix[i][j] += A[k][i] * A[k][j];
+              }
+            }
+          }
+          break;
+        case "Band":
+          for (let i = 0; i < matrixSize; i++) {
+            for (let j = 0; j < matrixSize; j++) {
+              newMatrix[i][j] =
+                Math.abs(i - j) <= bandWidth
+                  ? Math.floor(Math.random() * 20) - 10
+                  : 0;
+            }
+          }
+          break;
+        case "Diagonal":
+          for (let i = 0; i < matrixSize; i++) {
+            for (let j = 0; j < matrixSize; j++) {
+              newMatrix[i][j] =
+                i === j ? Math.floor(Math.random() * 20) - 10 : 0;
+            }
+          }
+          break;
+        default:
+          break;
       }
-    } else if (matrixType === "Band") {
-      // Band matrix
-      for (let i = 0; i < matrixSize; i++) {
-        for (let j = 0; j < matrixSize; j++) {
-          newMatrix[i][j] =
-            Math.abs(i - j) <= bandWidth // Bandwidth condition
-              ? Math.floor(Math.random() * 20) - 10
-              : 0;
-        }
-      }
-    }else if (matrixType=="Diagonal"){
-      for (let i = 0; i < matrixSize; i++) {
-        for (let j = 0; j < matrixSize; j++) {
-          newMatrix[i][j] =
-            i === j ? Math.floor(Math.random() * 20) - 10 : 0;
-        }
-      }
+
+      // Update the matrix and vector states after generation
+      setMatrix(newMatrix);
+      setVector(newVector);
+      setError(null); // Clear any previous errors
+    } else {
+      console.error("Matrix type or size is not selected");
     }
-    
-    setMatrix(newMatrix);
-    setVector(newVector);
-    setError(null);
   };
 
   const handleClearMatrix = () => {
@@ -198,7 +211,7 @@ const SystemResolution: React.FC = () => {
         break;
       case "Diagonal":
         matrixTypeCode = "diagonal";
-        break;  
+        break;
       default:
         matrixTypeCode = "unknown";
     }
@@ -253,7 +266,7 @@ const SystemResolution: React.FC = () => {
         value={matrixSize}
         onChange={handleMatrixSizeChange}
         min={2}
-        max={10}
+        max={5}
         className="form-control mb-3"
         style={{ width: "100px", margin: "0 auto" }}
       />

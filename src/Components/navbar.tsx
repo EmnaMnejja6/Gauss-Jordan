@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import Signup from "./Signup";
 import Login from "./Login";
 import "./navbar.css";
+import { MathJax, MathJaxContext } from "better-react-mathjax";
 const Navbar: React.FC = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
@@ -32,7 +33,7 @@ const Navbar: React.FC = () => {
               <span style={{ margin: "3px" }}>
                 <i className="bx bxs-home"></i>
               </span>
-              Acceuil
+              Accueil
             </a>
           </li>
           <li className="nav-item">
@@ -51,22 +52,59 @@ const Navbar: React.FC = () => {
               Cours
             </NavLink>
           </li>
-          <li className="nav-item">
-            <NavLink to="/resolution" className="nav-link">
-              <span style={{ margin: "3px" }}>
-                <i className="bx bxs-calculator"></i>
-              </span>
-              Résolution
-            </NavLink>
-          </li>
-          <li className="nav-item">
-            <NavLink to="/inverse" className="nav-link">
-              <span style={{ margin: "3px" }}>
-                <i className="bx bx-math"></i>
-              </span>
-              Inverse
-            </NavLink>
-          </li>
+          <MathJaxContext>
+            <li className="nav-item">
+              <NavLink
+                to="/resolution"
+                className="nav-link"
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              >
+                Résolution
+                <MathJax dynamic>{`\\( Ax=b \\)`}</MathJax>
+              </NavLink>
+            </li>
+          </MathJaxContext>
+
+          <MathJaxContext>
+            <li
+              className="nav-item"
+              style={{
+                fontSize: "18px",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
+            >
+              <NavLink
+                to="/inverse"
+                className="nav-link"
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              >
+                Inverse
+                <MathJax dynamic>{`\\( A^{-1} \\)`}</MathJax>
+              </NavLink>
+            </li>
+          </MathJaxContext>
+          <MathJaxContext>
+            <li
+              className="nav-item"
+              style={{
+                fontSize: "18px",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
+            >
+              <NavLink
+                to="/determinant"
+                className="nav-link"
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              >
+                Déterminant
+                <MathJax dynamic>{`\\( |A| \\)`}</MathJax>
+              </NavLink>
+            </li>
+          </MathJaxContext>
 
           <li className="bg-primary">
             <button

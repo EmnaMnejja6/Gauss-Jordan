@@ -28,7 +28,7 @@ const Signup = ({ openLogin }: { openLogin: () => void }) => {
         <h3>Créer un compte</h3>
         <div className="mb-3">
           <label htmlFor="username" className="form-label">
-            <i className="bx bx-mail-send"></i> Username
+            <i className="bx bx-user"></i> Username
           </label>
           <input
             type="text"
@@ -72,7 +72,11 @@ const Signup = ({ openLogin }: { openLogin: () => void }) => {
           />
         </div>
         <div className="d-grid">
-          <button type="submit" className="btn btn-primary">
+          <button
+            type="submit"
+            className="btn btn-primary"
+            onClick={handleSubmit}
+          >
             <i className="bx bx-log-in"></i> S'inscrire
           </button>
         </div>

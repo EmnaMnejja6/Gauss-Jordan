@@ -1,29 +1,17 @@
 import React, { useState } from "react";
-import MatrixInputFile from "./MatrixInputFile";
-import MatrixInputRandom from "./MatrixInputRandom";
-import MatrixInputManual from "./MatrixInputManual";
 import "bootstrap/dist/css/bootstrap.min.css";
+import InverseManual from "./InverseManual";
+import InverseFile from "./InverseFile";
 
-const Resolution: React.FC = () => {
+const InverseCalculation: React.FC = () => {
   const [inputType, setInputType] = useState<String | null>(null);
-  const [matrixSize, setMatrixSize] = useState<number>(2); // Default matrix size
-
-  // Callback function to update matrix size and handle inputType change
-  const handleMatrixSizeChange = (size: number) => {
-    setMatrixSize(size);
-
-    // If size > 10, switch to "file" input method
-    if (size > 10) {
-      setInputType("file");
-    }
-  };
 
   return (
     <div>
       <div
         className="container card shadow p-4 mb-5 bg-white rounded"
         style={{
-          maxWidth: "1000px",
+          width: "1000px",
           marginLeft: "280px",
           marginTop: "80px",
           fontSize: "18px",
@@ -38,7 +26,6 @@ const Resolution: React.FC = () => {
         >
           {[
             { value: "manual", label: "Saisie Manuelle", icon: "bx-pencil" },
-            { value: "random", label: "Aléatoire", icon: "bx-dice-5" },
             {
               value: "file",
               label: "Importer à partir d'un fichier",
@@ -56,7 +43,7 @@ const Resolution: React.FC = () => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                gap: "5px", // Space between icon and text
+                gap: "5px",
               }}
               onClick={() => setInputType(value)}
             >
@@ -66,17 +53,11 @@ const Resolution: React.FC = () => {
           ))}
         </div>
 
-        {inputType === "manual" && (
-          <MatrixInputManual
-            matrixSize={matrixSize}
-            onMatrixSizeChange={handleMatrixSizeChange}
-          />
-        )}
-        {inputType === "random" && <MatrixInputRandom />}
-        {inputType === "file" && <MatrixInputFile />}
+        {inputType === "manual" && <InverseManual />}
+        {inputType === "file" && <InverseFile />}
       </div>
     </div>
   );
 };
 
-export default Resolution;
+export default InverseCalculation;

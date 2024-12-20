@@ -8,27 +8,147 @@ const About: React.FC = () => {
     <div
       style={{
         padding: "3rem 1rem",
-        textAlign: "center",
         borderColor: "black",
-        border: "1px solid",
+        border: "1px",
         borderRadius: "10px",
         marginTop: "80px",
-        marginLeft: "420px",
         maxWidth: "150vh",
-        boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.2)",
+        marginLeft: "380px",
+        boxShadow: "0px 0px 10px rgba(206, 200, 200, 0.97)",
       }}
     >
-      <h2 style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>À propos</h2>
+      <h3 style={{ fontSize: "20 px", marginBottom: "1.5rem" }}>À propos</h3>
       <p
-        style={{ fontSize: "1.2rem", maxWidth: "800px", margin: "0 auto 3rem" }}
+        style={{
+          fontSize: "17 px",
+          maxWidth: "800px",
+          margin: "0 auto 3rem",
+          lineHeight: "1.8",
+          padding: "1rem",
+          backgroundColor: "rgb(231, 249, 255)",
+          borderRadius: "8px",
+          boxShadow: "0 4px 8px rgba(191, 207, 252, 0.03)",
+        }}
       >
         Bienvenue sur notre site web! Ce site a été créé dans le contexte d'un
-        projet pour la matière Algorithme Numériques. Ce site est dédié pour la
-        résolution des systèmes linéaires et le calcul de l'inverse d'une
-        matrice en utilisant la méthode de Gauss-Jordan. Ici, vous trouverez des
-        informations sur notre équipe.
+        projet pour la matière Algorithmes Numériques. Ce site est dédié à la
+        résolution des systèmes linéaires et au calcul de l'inverse d'une
+        matrice en utilisant la méthode de Gauss-Jordan. Vous trouverez des
+        informations sur notre équipe et les fonctionnalités offertes.
       </p>
 
+      <h3 style={{ fontSize: "20 px", marginBottom: "1.5rem" }}>
+        Fonctionnalités du site web
+      </h3>
+      <div
+        style={{
+          textAlign: "left",
+          maxWidth: "800px",
+          margin: "0 auto 3rem",
+          fontSize: "17 px",
+          lineHeight: "1.8",
+          padding: "1rem",
+          backgroundColor: "rgb(231, 249, 255)",
+          borderRadius: "8px",
+          boxShadow: "0 4px 8px rgba(191, 207, 252, 0.03)",
+        }}
+      >
+        <ul
+          style={{
+            listStyle: "none",
+            padding: "0",
+            fontSize: "17px",
+          }}
+        >
+          <li
+            style={{
+              marginBottom: "1rem",
+              padding: "0.5rem",
+              borderBottom: "1px solid #ddd",
+            }}
+          >
+            <strong>➤</strong> Possibilité de saisie manuelle de matrices
+            (taille jusqu'à 10).
+          </li>
+          <li
+            style={{
+              marginBottom: "1rem",
+              padding: "0.5rem",
+              borderBottom: "1px solid #ddd",
+            }}
+          >
+            <strong>➤</strong> Génération aléatoire de matrices (taille jusqu'à
+            10).
+          </li>
+          <li
+            style={{
+              marginBottom: "1rem",
+              padding: "0.5rem",
+              borderBottom: "1px solid #ddd",
+            }}
+          >
+            <strong>➤</strong> Importation de matrices à partir d'un fichier
+            avec détection automatique du type de matrice.
+          </li>
+          <li
+            style={{
+              marginBottom: "1rem",
+              padding: "0.5rem",
+              borderBottom: "1px solid #ddd",
+            }}
+          >
+            <strong>➤</strong> Téléchargement de la matrice augmentée du système
+            dans un fichier pour une réutilisabilité facile.
+          </li>
+          <li
+            style={{
+              marginBottom: "1rem",
+              padding: "0.5rem",
+            }}
+          >
+            <strong>➤</strong> Les fichiers téléchargés incluent un code dans la
+            première ligne qui identifie le type de matrice :
+            <ul
+              style={{
+                marginLeft: "2rem",
+                listStyle: "circle",
+                marginTop: "1rem",
+              }}
+            >
+              <li>
+                <strong style={{ color: "blue" }}>spd</strong> : Symétrique
+                définie positive
+              </li>
+              <li>
+                <strong style={{ color: "blue" }}>dd</strong> : Diagonale
+                dominante
+              </li>
+              <li>
+                <strong style={{ color: "blue" }}>upper</strong> : Triangulaire
+                supérieure
+              </li>
+              <li>
+                <strong style={{ color: "blue" }}>inf</strong> : Triangulaire
+                inférieure
+              </li>
+              <li>
+                <strong style={{ color: "blue" }}>d</strong> : Diagonale
+              </li>
+              <li>
+                <strong style={{ color: "blue" }}>band</strong> : Bande
+              </li>
+              <li>
+                <strong style={{ color: "blue" }}>dense</strong> : Dense
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+      <h3 style={{ fontSize: "20 px", marginBottom: "1.5rem" }}>
+        Développeurs
+      </h3>
+      <br />
       <div
         style={{
           display: "flex",
@@ -59,7 +179,7 @@ const About: React.FC = () => {
             className="card"
             key={index}
             style={{
-              width: "300px",
+              width: "250px",
               boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
               borderRadius: "8px",
               overflow: "hidden",
@@ -70,7 +190,7 @@ const About: React.FC = () => {
               className="card-img-top"
               src={member.img}
               alt={`${member.name}`}
-              style={{ height: "300px", objectFit: "cover" }}
+              style={{ height: "200px" }}
             />
             <div className="card-body" style={{ padding: "1rem" }}>
               <h5
@@ -124,7 +244,7 @@ const About: React.FC = () => {
         <div
           className="card"
           style={{
-            width: "300px",
+            width: "250px",
             boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
             borderRadius: "8px",
             overflow: "hidden",
@@ -137,7 +257,7 @@ const About: React.FC = () => {
             className="card-img-top"
             src={madame}
             alt="Madame Sirine Marrakchi"
-            style={{ height: "300px", objectFit: "cover" }}
+            style={{ height: "200px", objectFit: "cover" }}
           />
           <div className="card-body" style={{ padding: "1rem" }}>
             <h5

@@ -11,8 +11,7 @@ import {
   isLowerTriangular,
   isDiagonallyDominant,
   gaussJordanDiagonal,
-  gaussJordanDiagonal,
-} from "../utils/matrixCalculations";
+} from "../../utils/matrixCalculations";
 
 const MatrixInputFile: React.FC = () => {
   const [matrixSize, setMatrixSize] = useState<number>(2);
@@ -22,6 +21,16 @@ const MatrixInputFile: React.FC = () => {
   const [steps, setSteps] = useState<string[]>([]);
   const [showSteps, setShowSteps] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const matrixTypeLabels: { [key: string]: string } = {
+    spd: "Symétrique définie positive",
+    dd: "À diagonale dominante",
+    upper: "Triangulaire supérieure",
+    lower: "Triangulaire inférieure",
+    dense: "Dense",
+    band: "Bande",
+    diagonal: "Diagonale",
+  };
+
   const renderSolutionMatrix = () => {
     if (!solutionMatrix) return null;
 
@@ -85,7 +94,11 @@ const MatrixInputFile: React.FC = () => {
       const firstLine = lines[0]?.toLowerCase();
       let matrixType = "";
 
-      if (["spd", "dd", "upper", "lower", "dense","band","diagonal"].includes(firstLine)) {
+      if (
+        ["spd", "dd", "upper", "lower", "dense", "band", "diagonal"].includes(
+          firstLine
+        )
+      ) {
         matrixType = firstLine;
         lines.shift();
       }
@@ -149,8 +162,8 @@ const MatrixInputFile: React.FC = () => {
           result = resolveLowerTriangular(matrix);
           break;
         case "diagonal":
-          result=gaussJordanDiagonal(matrix);
-          break;  
+          result = gaussJordanDiagonal(matrix);
+          break;
         default:
           throw new Error("Invalid matrix type.");
       }
@@ -185,9 +198,7 @@ const MatrixInputFile: React.FC = () => {
         style={{ width: "100px", margin: "0 auto" }}
       />
       <h2>Importer un fichier</h2>
-
       {error && <div className="alert alert-danger">{error}</div>}
-
       <div className="button-container mt-3">
         <input
           type="file"
@@ -198,11 +209,13 @@ const MatrixInputFile: React.FC = () => {
         <br />
         <br />
       </div>
-
-      {matrixType && (
-        <div className="alert alert-info">Type de matrice: {matrixType}</div>
-      )}
-
+      <div>
+        {matrixType && (
+          <div className="alert alert-info">
+            Type de matrice: {matrixTypeLabels[matrixType] || "Type inconnu"}
+          </div>
+        )}
+      </div>
       {solutionMatrix && (
         <div>
           <h2>Résolution du système</h2>

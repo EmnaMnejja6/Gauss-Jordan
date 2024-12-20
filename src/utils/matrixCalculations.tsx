@@ -401,6 +401,81 @@ export function gaussJordanWithPivot(matrix: number[][]): {
   steps.push(`\\text{Nombre total d'opérations : ${operations}.}`);
   return { matrix, steps };
 }
+export function CalculDeterminant(matrix: number[][]): {
+  determinant: number;
+  steps: string[];
+} {
+  const n = matrix.length;
+  let det = 1.0; // Initialisation
+  let swaps = 0; // Nombre de permutations de lignes
+  const steps: string[] = [];
+
+  const mat = matrix.map((row) => [...row]);
+
+  for (let col = 0; col < n; ++col) {
+    // Trouver le pivot maximum dans la colonne
+    let pivot = col;
+    for (let i = col + 1; i < n; ++i) {
+      if (Math.abs(mat[i][col]) > Math.abs(mat[pivot][col])) {
+        pivot = i;
+      }
+    }
+
+    // Si le pivot est zéro, le déterminant est zéro
+    if (Math.abs(mat[pivot][col]) < 1e-9) {
+      steps.push(
+        `\\text{Le pivot dans la colonne ${
+          col + 1
+        } est nul, donc le déterminant est 0.}`
+      );
+      return { determinant: 0, steps };
+    }
+
+    // Permuter les lignes si nécessaire
+    if (pivot !== col) {
+      [mat[pivot], mat[col]] = [mat[col], mat[pivot]];
+      swaps++;
+      steps.push(
+        `\\text{Permutation des lignes ${pivot + 1} et ${
+          col + 1
+        } (indices 1-basés) :}\\ ${formatMatrix(mat)}`
+      );
+    }
+
+    // Élimination des lignes en dessous du pivot
+    for (let i = col + 1; i < n; ++i) {
+      const factor = mat[i][col] / mat[col][col];
+      for (let j = col; j < n; ++j) {
+        mat[i][j] -= factor * mat[col][j];
+      }
+      steps.push(
+        `\\text{Élimination de la ligne ${
+          i + 1
+        } en utilisant un facteur de ${factor.toFixed(6)} :}\\ ${formatMatrix(
+          mat
+        )}`
+      );
+    }
+  }
+
+  // Calculer le déterminant comme le produit des éléments diagonaux
+  for (let i = 0; i < n; ++i) {
+    det *= mat[i][i];
+  }
+
+  // Ajuster le déterminant en fonction du nombre de permutations de lignes
+  if (swaps % 2 !== 0) {
+    det = -det;
+  }
+
+  steps.push(
+    `\\text{Le déterminant final est calculé comme le produit des éléments diagonaux : ${det.toFixed(
+      6
+    )}}`
+  );
+
+  return { determinant: det, steps };
+}
 
 export function inverseMatrix(mat: number[][]): {
   matrix: number[][]; // La matrice finale après réduction

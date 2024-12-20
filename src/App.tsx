@@ -3,12 +3,13 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Navbar from "./Components/navbar";
 import Home from "./Components/Home";
 import Cours from "./Components/Course";
-import InverseCalculation from "./Components/InverseCalculation";
-import Resolution from "./Components/Resolution";
+import InverseCalculation from "./Components/Inverse/InverseCalculation";
+import Resolution from "./Components/Resolution/Resolution";
 import About from "./Components/about";
-import MatrixInputFile from "./Components/MatrixInputFile";
+import MatrixInputFile from "./Components/Resolution/MatrixInputFile";
 
 import { Route, Routes, useLocation } from "react-router-dom";
+import DeterminantCalculation from "./Components/Determinant/determinant";
 ("./Components/About");
 const App: React.FC = () => {
   const location = useLocation();
@@ -28,6 +29,7 @@ const App: React.FC = () => {
         <Route path="/courses" element={<Cours />} />
         <Route path="/resolution" element={<Resolution />} />
         <Route path="/inverse" element={<InverseCalculation />} />
+        <Route path="/determinant" element={<DeterminantCalculation />} />
         <Route path="/matrix-input-file" element={<MatrixInputFile />} />
       </Routes>
     </div>

@@ -8,12 +8,13 @@ import {
   resolveUpperTriangular,
   resolveLowerTriangular,
   resolveDiagonal,
-} from "../utils/matrixCalculations";
+} from "../../utils/matrixCalculations";
 
 interface MatrixInputManualProps {
   matrixSize: number;
   onMatrixSizeChange: (size: number) => void;
 }
+
 const MatrixInputManual: React.FC<MatrixInputManualProps> = ({
   matrixSize,
   onMatrixSizeChange,
@@ -34,6 +35,7 @@ const MatrixInputManual: React.FC<MatrixInputManualProps> = ({
   useEffect(() => {
     setMatrixData([]);
   }, [matrixType]);
+
   const handleResolution = () => {
     try {
       const augmentedMatrix = matrix.map((row, index) => [
@@ -59,8 +61,8 @@ const MatrixInputManual: React.FC<MatrixInputManualProps> = ({
           result = resolveBand(augmentedMatrix, bandWidth);
           break;
         case "Diagonal":
-          result=resolveDiagonal(augmentedMatrix);
-          break;  
+          result = resolveDiagonal(augmentedMatrix);
+          break;
         case "Dense":
         default:
           result = gaussJordanWithPivot(augmentedMatrix);
@@ -75,7 +77,7 @@ const MatrixInputManual: React.FC<MatrixInputManualProps> = ({
   };
 
   const handleMatrixSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const size = parseInt(e.target.value, 10);
+    let size = parseInt(e.target.value, 10);
 
     onMatrixSizeChange(size);
     setMatrix(
@@ -128,7 +130,7 @@ const MatrixInputManual: React.FC<MatrixInputManualProps> = ({
             rowIndex + 1
           },${rowIndex + 1}]| ≥ ${rowSum}.`
         );
-        return; // Do not update the matrix if diagonal dominance is violated
+        return;
       }
     }
 
@@ -216,8 +218,8 @@ const MatrixInputManual: React.FC<MatrixInputManualProps> = ({
         matrixTypeCode = "band";
         break;
       case "Diagonal":
-        matrixTypeCode="diagonal";
-        break;  
+        matrixTypeCode = "diagonal";
+        break;
       default:
         matrixTypeCode = "unknown";
     }
@@ -261,7 +263,7 @@ const MatrixInputManual: React.FC<MatrixInputManualProps> = ({
               label: "Symétrique Définie Positive",
             },
             { type: "Band", label: "Bande" },
-            {type: "Diagonal", label: "Diagonale" },
+            { type: "Diagonal", label: "Diagonale" },
           ].map(({ type, label }, idx) => (
             <button
               key={idx}
@@ -291,10 +293,10 @@ const MatrixInputManual: React.FC<MatrixInputManualProps> = ({
             <input
               type="number"
               value={bandWidth}
-              onChange={(e) => setBandWidth(parseInt(e.target.value, 10))}
+              onChange={(e) => setBandWidth(parseInt(e.target.value, 5))}
               className="form-control"
               style={{ width: "100px", margin: "0 auto" }}
-              min={1}
+              min={2}
               max={matrixSize - 1}
             />
           </div>
@@ -307,6 +309,7 @@ const MatrixInputManual: React.FC<MatrixInputManualProps> = ({
         type="number"
         value={matrixSize}
         min={2}
+        max={5}
         onChange={handleMatrixSizeChange}
         className="form-control mb-3"
         style={{ width: "100px", margin: "0 auto" }}
@@ -325,11 +328,6 @@ const MatrixInputManual: React.FC<MatrixInputManualProps> = ({
             >
               {/* A = */}
               <MathJax dynamic>{`\\[ A = \\]`}</MathJax>
-
-              {/* Open Parenthesis */}
-              <MathJax dynamic>
-                <div style={{ fontSize: "35px" }}>{`\\[ \\bigg[ \\]`}</div>
-              </MathJax>
 
               {/* Inputs for Matrix A */}
               <div className="table-responsive">
@@ -354,8 +352,9 @@ const MatrixInputManual: React.FC<MatrixInputManualProps> = ({
                                 (matrixType === "Symmetric Positive Definite" &&
                                   rowIndex < colIndex) ||
                                 (matrixType === "Band" &&
-                                  Math.abs(rowIndex - colIndex) > bandWidth)||
-                            (matrixType === "Diagonal" && rowIndex !== colIndex) 
+                                  Math.abs(rowIndex - colIndex) > bandWidth) ||
+                                (matrixType === "Diagonal" &&
+                                  rowIndex !== colIndex)
                               }
                             />
                           </td>
@@ -365,11 +364,6 @@ const MatrixInputManual: React.FC<MatrixInputManualProps> = ({
                   </tbody>
                 </table>
               </div>
-
-              {/* Close Parenthesis */}
-              <MathJax dynamic>
-                <div style={{ fontSize: "35px" }}>{`\\[ \\bigg] \\]`}</div>
-              </MathJax>
             </div>
           </MathJaxContext>
         </div>
@@ -387,11 +381,6 @@ const MatrixInputManual: React.FC<MatrixInputManualProps> = ({
               {/* b = */}
               <MathJax dynamic>{`\\[ b = \\]`}</MathJax>
 
-              {/* Open Parenthesis */}
-              <MathJax dynamic>
-                <div style={{ fontSize: "30px" }}>{`\\[ \\bigg( \\]`}</div>
-              </MathJax>
-
               {/* Inputs for Vector b */}
               <div className="table-responsive" style={{ margin: "0 10px" }}>
                 <table className="table table-borderless">
@@ -408,7 +397,7 @@ const MatrixInputManual: React.FC<MatrixInputManualProps> = ({
                             style={{
                               textAlign: "center",
                               borderRadius: "8px",
-                              border: "1px solid #ced4da",
+                              border: "1px solid rgb(155, 157, 159)",
                               width: "60px",
                             }}
                           />
@@ -418,11 +407,6 @@ const MatrixInputManual: React.FC<MatrixInputManualProps> = ({
                   </tbody>
                 </table>
               </div>
-
-              {/* Close Parenthesis */}
-              <MathJax dynamic>
-                <div style={{ fontSize: "30px" }}>{`\\[ \\bigg) \\]`}</div>
-              </MathJax>
             </div>
           </MathJaxContext>
         </div>
